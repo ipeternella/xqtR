@@ -2,10 +2,20 @@ package config
 
 import "github.com/rs/zerolog"
 
-var StrToLogLevelMapping = map[string]zerolog.Level{
-	"debug": zerolog.DebugLevel,
-	"info":  zerolog.InfoLevel,
-	"warn":  zerolog.WarnLevel,
-	"error": zerolog.ErrorLevel,
-	"fatal": zerolog.FatalLevel,
+// ParseLevel parses log level strings into ZeroLog's constants
+func ParseLevel(level string) zerolog.Level {
+	switch level {
+	case "debug":
+		return zerolog.DebugLevel
+	case "info":
+		return zerolog.InfoLevel
+	case "warn":
+		return zerolog.WarnLevel
+	case "error":
+		return zerolog.ErrorLevel
+	case "fatal":
+		return zerolog.FatalLevel
+	default:
+		return zerolog.Disabled // wrong setting
+	}
 }
