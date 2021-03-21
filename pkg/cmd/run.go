@@ -4,10 +4,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/IgooorGP/xqtR/internal/app"
 	"github.com/IgooorGP/xqtR/internal/config"
-	"github.com/IgooorGP/xqtR/internal/startup"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +25,7 @@ func newRunCmd(cfg *config.XqtRConfig) *cobra.Command {
 	}
 
 	// persistent flags -> cascades to subcommands
-	cmd.PersistentFlags().StringVarP(&cfg.JobFilePath, "file", "f", "job.yml", "the job file yaml location with the steps to be executed")
+	cmd.PersistentFlags().StringVarP(&cfg.JobFilePath, "file", "f", "job.yaml", "the job file yaml location with the steps to be executed")
 	cmd.PersistentFlags().BoolVar(&cfg.IsDryRun, "dry-run", false, "runs the job's steps without actually executing anything")
 
 	return cmd
@@ -34,8 +33,10 @@ func newRunCmd(cfg *config.XqtRConfig) *cobra.Command {
 
 func newRunCmdHandler(cfg *config.XqtRConfig) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		startup.Boot(cfg)
-		log.Info().Msg("Running...")
+		xqtr := app.NewXqtR(cfg)
+
+		xqtr.Startup()
+		xqtr.Run()
 	}
 }
 
