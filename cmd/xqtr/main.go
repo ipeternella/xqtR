@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import "github.com/IgooorGP/xqtR/pkg/cmd"
 
 func main() {
-	fmt.Println("hi!")
+	xqtR := cmd.NewXqtRCmd()
+
+	xqtR.Execute()
 }

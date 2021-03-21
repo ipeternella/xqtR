@@ -8,8 +8,7 @@ import (
 func newVersionCmd() *cobra.Command {
 	versionCmd := &cobra.Command{
 		Use:   "version ",
-		Short: "Prints Mint's current version.",
-		Long:  "Mint's installed version.",
+		Short: "Prints xqtR's current version.",
 		Run: func(cmd *cobra.Command, args []string) {
 			log.Info().Msgf("xqtr's current version: 1.0.0")
 		},

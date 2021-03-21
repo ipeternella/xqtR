@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"github.com/IgooorGP/xqtR/internal/config"
 	"github.com/spf13/cobra"
 )
 
 // NewXqtRCmd creates the `xqtr` command and its nested subcommands.
 func NewXqtRCmd() *cobra.Command {
+	xqtRConfig := config.NewXqtRConfigWithDefaults()
 
 	// main cmd
 	var rootCmd = &cobra.Command{
@@ -20,6 +22,7 @@ func NewXqtRCmd() *cobra.Command {
 
 	// cli commands wire up
 	rootCmd.AddCommand(newVersionCmd())
+	rootCmd.AddCommand(newRunCmd(&xqtRConfig))
 
 	return rootCmd
 }
