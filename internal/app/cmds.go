@@ -74,7 +74,7 @@ func executeJobStep(jobStep JobStep, debug bool) {
 }
 
 func executeJob(job Job, debug bool) {
-	log.Info().Msgf("📝 job: %s ...", job.Title)
+	log.Info().Msgf("📝 job: %s", job.Title)
 
 	for _, jobStep := range job.Steps {
 		executeJobStep(jobStep, debug)
