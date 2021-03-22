@@ -1,6 +1,7 @@
 package app
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -18,59 +19,59 @@ type Steps struct {
 }
 
 // ExtractCommandAndArgsFromString - reads a string and parses it to a terminal command
-func shellCommand(command string) *exec.Cmd {
+func shellCommand(command string) (*exec.Cmd, *io.ReadCloser, *io.ReadCloser) {
 	cmd := exec.Command("bash", "-c", command) // TODO: improve
-	return cmd
+
+	// adds an os.Pipe to the cmd stdstreams so that xqtR's main process can read the
+	// the stdout and stderr of the new cmd spawned process
+	stdoutPipe, _ := cmd.StdoutPipe()
+	stderrPipe, _ := cmd.StderrPipe()
+
+	return cmd, &stdoutPipe, &stderrPipe
 }
 
-const (
-	processWarningHeader = "\n>--- Warnings: ---<\n\n"
-	processWarningFooter = "\n>-----------------<"
-	processStdoutHeader  = "\n>--- Stdout: ---<\n\n"
-	processStdoutFooter  = "\n>---------------<"
-	processStderrHeader  = "\n>--- Stderr: ---<\n\n"
-	processStderrFooter  = "\n>---------------<"
-)
+func readPipe(cmdPipe *io.ReadCloser) []byte {
+	bufferData, err := ioutil.ReadAll(*cmdPipe)
+
+	if err != nil {
+		log.Error().Msgf("Error when reading cmd buffer: %s", err.Error())
+		os.Exit(1)
+	}
+
+	return bufferData
+}
+
+func readCmdStdStreams(cmdStdoutPipe *io.ReadCloser, cmdStderrPipe *io.ReadCloser, readStdout bool) ([]byte, []byte) {
+	var stdoutData []byte
+	var stderrData []byte
+
+	if readStdout {
+		stdoutData = readPipe(cmdStdoutPipe)
+	}
+	stderrData = readPipe(cmdStderrPipe)
+
+	return stdoutData, stderrData
+}
 
 func executeJobStep(jobStep JobStep, debug bool) {
 	log.Info().Msgf("⏳ step: %s", jobStep.Name)
 
-	cmd := shellCommand(jobStep.Run)
-	stdoutBuffer, _ := cmd.StdoutPipe()
-	stderrBuffer, _ := cmd.StderrPipe()
-	var stdout []byte
-	var stderr []byte
+	cmd, cmdStdoutPipe, cmdStderrPipe := shellCommand(jobStep.Run)
 
+	// spawns a new OS process with the cmd
 	if err := cmd.Start(); err != nil {
-		log.Fatal().AnErr("An error happened while starting the cmd", err)
+		log.Fatal().Msgf("An error happened while starting the cmd", err.Error())
 	}
 
-	if debug {
-		// log.Debug().Msgf("Reading from cmd's stdout...: %s", cmd)
-		stdout, _ = ioutil.ReadAll(stdoutBuffer)
-	}
+	// pipes must be passed by reference, naturally
+	stdoutData, stderrData := readCmdStdStreams(cmdStdoutPipe, cmdStderrPipe, debug)
 
-	// log.Debug().Msgf("Reading from cmd's stderr...: %s", cmd)
-	stderr, _ = ioutil.ReadAll(stderrBuffer)
-
-	// wait for cmd completion
+	// waits for cmd completion (also closes stdstreams)
 	if err := cmd.Wait(); err != nil {
-		log.Error().Msgf("%s%s%s", processStderrHeader, stderr, processStderrFooter)
-		log.Error().Msgf("⌛ step: %s ✖️", jobStep.Name)
-		os.Exit(1)
+		printCmdFailure(jobStep.Name, stdoutData, stderrData, debug)
 	}
 
-	// stderr is also used for warnings when the process does not exit with a non-zero status code
-	if len(stderr) > 0 {
-		log.Warn().Msgf("%s%s%s", processWarningHeader, stderr, processWarningFooter)
-	}
-
-	// stdout is print only if debug is on
-	if debug && len(stdout) > 0 {
-		log.Debug().Msgf("%s%s%s", processStdoutHeader, stdout, processStdoutFooter)
-	}
-
-	log.Info().Msgf("⌛ step: %s ✓", jobStep.Name)
+	printCmdFeedback(jobStep.Name, stdoutData, stderrData, debug)
 }
 
 func executeJob(job Job, debug bool) {
