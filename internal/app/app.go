@@ -47,7 +47,8 @@ func (xqtr *XqtR) Run() {
 			log.Error().Msg("Another error has been captured!")
 		}
 	}
-	log.Info().Msgf("%s", viper.Get("jobs.before.steps"))
+	yml := viper.GetViper()
 
 	// extract jobs and create functions to invoke them
+	executeJob(yml, true)
 }
