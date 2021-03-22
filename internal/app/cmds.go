@@ -26,23 +26,34 @@ func shellCommand(command string) *exec.Cmd {
 	return cmd
 }
 
-func executeJob(yml *viper.Viper, debug bool) {
+const (
+	processWarningHeader = "\n>--- Warnings: ---<\n\n"
+	processWarningFooter = "\n>-----------------<"
+	processStdoutHeader  = "\n>--- Stdout: ---<\n\n"
+	processStdoutFooter  = "\n>---------------<"
+	processStderrHeader  = "\n>--- Stderr: ---<\n\n"
+	processStderrFooter  = "\n>---------------<"
+)
+
+func executeJobs(yml *viper.Viper, debug bool) {
 	// gets all jobs
 	allJobs := yml.Get("jobs").(map[string]interface{})
 	jobsCount := len(allJobs)
 	log.Info().Msgf("Found %d jobs to execute. Starting...", jobsCount)
 
 	// go to its steps
-	for k := range allJobs {
+	for jobName := range allJobs {
 		jobSteps := Steps{Steps: []Step{}}
 
-		if err := viper.UnmarshalKey(fmt.Sprintf("jobs.%s", k), &jobSteps); err != nil {
+		if err := viper.UnmarshalKey(fmt.Sprintf("jobs.%s", jobName), &jobSteps); err != nil {
 			panic(err)
 		}
 
+		log.Info().Msgf("📝 job: %s ...", jobName)
+
 		// exec each cmd
 		for _, step := range jobSteps.Steps {
-			log.Info().Msgf("⏳: %s", step.Name)
+			log.Info().Msgf("⏳ step: %s", step.Name)
 
 			cmd := shellCommand(step.Run)
 			stdoutBuffer, _ := cmd.StdoutPipe()
@@ -64,21 +75,22 @@ func executeJob(yml *viper.Viper, debug bool) {
 
 			// wait for cmd completion
 			if err := cmd.Wait(); err != nil {
-				if err.Error() == "exec: not started" {
-					log.Error().Msgf("❌: cmd %s was not found!", cmd.Path)
-				} else {
-					log.Error().Msgf("❌: cmd %s has raised an error!", cmd.Path)
-					log.Error().Msgf("📜: %s", stderr)
-				}
-
+				log.Error().Msgf("%s%s%s", processStderrHeader, stderr, processStderrFooter)
+				log.Error().Msgf("⌛ step: %s ✖️", step.Name)
 				os.Exit(1)
 			}
 
-			if debug && len(stdout) > 0 {
-				log.Debug().Msgf("📜 stdout:\n%s", stdout)
+			// stderr is also used for warnings when the process does not exit with a non-zero status code
+			if len(stderr) > 0 {
+				log.Warn().Msgf("%s%s%s", processWarningHeader, stderr, processWarningFooter)
 			}
 
-			log.Info().Msgf("⌛: %s ✓\n", step.Name)
+			// stdout is print only if debug is on
+			if debug && len(stdout) > 0 {
+				log.Debug().Msgf("%s%s%s", processStdoutHeader, stdout, processStdoutFooter)
+			}
+
+			log.Info().Msgf("⌛ step: %s ✓", step.Name)
 		}
 	}
 }
