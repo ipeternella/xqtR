@@ -77,8 +77,50 @@ func executeJobStep(jobStep JobStep, debug bool) {
 func executeJob(job Job, debug bool) {
 	log.Info().Msgf("📝 job: %s", job.Title)
 
-	for _, jobStep := range job.Steps {
-		executeJobStep(jobStep, debug)
+	if job.NumWorkers > 0 {
+		numTasks := len(job.Steps)
+		log.Info().Msgf("%d", numTasks)
+
+		// var workerResults []*WorkerResult
+		workerResults := make([]*WorkerResult, numTasks)
+
+		workerResultsChan := make(chan *WorkerResult, numTasks) // buffered channel
+		taskQueue := make(chan *WorkerData)                     // unbuffered channel
+		taskId := 0
+
+		// spawn NumWorkers goroutines that are initially blocked (no tasks)
+		for workerId := 1; workerId <= job.NumWorkers; workerId++ {
+			go executeJobStepByWorker(workerResultsChan, taskQueue)
+		}
+
+		// publish tasks to workers
+		for _, jobStep := range job.Steps {
+			taskId++
+			workerData := newWorkerData(taskId, jobStep, debug)
+			taskQueue <- workerData
+		}
+
+		// no more tasks (breaks loops from workers)
+		close(taskQueue)
+
+		// collect results
+		for i := 0; i < numTasks; i++ {
+			workerResults[i] = <-workerResultsChan
+		}
+
+		for _, rslt := range workerResults {
+
+			if rslt.Result.Err != nil {
+				printCmdFailure(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, debug)
+			}
+
+			printCmdFeedback(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, debug)
+		}
+
+	} else {
+		for _, jobStep := range job.Steps {
+			executeJobStep(jobStep, debug)
+		}
 	}
 }
 
