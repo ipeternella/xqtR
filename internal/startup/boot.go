@@ -18,6 +18,7 @@ func Boot(cfg *config.XqtRConfig) {
 
 func setupLogger(cfg *config.XqtRConfig) {
 	// zerolog's global logger setup
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
+	logFormat := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Kitchen}
+	log.Logger = zerolog.New(logFormat).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(config.ParseLevel(cfg.LogLevel))
 }
