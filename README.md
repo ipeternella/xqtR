@@ -1,12 +1,12 @@
-# xqtR (The executor)
+# 🛠️ xqtR (executoR) 🛠️
 
-🖥️ `xqtR` (short for executor) is a command line tool to execute a series of jobs on your own machine and concurrently if desired! 💻
+`xqtR` (short for executor) is a command line tool to execute a series of jobs specified by job yaml files. The steps in a job can be run concurrently (by spawning goroutines in a workpool) or in the old fashioned sync way (default).
 
-A quick demo of running a `job.yaml` which contains a job whose steps will be run by a single goroutine:
+A quick demo of running a `job.yaml` which contains a job whose steps will be run by a single main goroutine (sync):
 
 ![xqtR sync demo](docs/demos/xqtr-sync-demo.gif)
 
-Now, a similar `job.yaml` which runs the same steps but spawns goroutines to run the steps in parallel (when possible) according to `num_workers` in the yaml file:
+Now, a similar `job.yaml` which runs the same steps but spawns goroutines (async) to run the steps in parallel (when possible) according to `num_workers` in the yaml file:
 
 ![xqtR async demo](docs/demos/xqtr-async-demo.gif)
 
