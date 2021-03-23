@@ -1,0 +1,10 @@
+jobs:
+  - title: running async sleeps
+    num_workers: 3
+    steps:
+      - name: sleep 1
+        run: sleep 1 && echo "slept for 1s"
+      - name: sleep 2
+        run: sleep 2 && echo "slept for 2s"
+      - name: sleep 3
+        run: sleep 3 && echo "slept for 3s"
