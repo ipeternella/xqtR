@@ -1,29 +1,13 @@
 jobs:
-  before: # in order (1 worker only)
+  - title: installing software providers...
     steps:
-      - name: install brew
-        run:
-          [
-            bash,
-            -c,
-            "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)",
-          ]
-      - name: update brew repositories
-        run: [brew, update]
+      - name: brew update
+        run: brew update
 
-  main: # concurrent runs
-    workers: 4 # optional, defaults to 1
+  - title: install apps with software providers...
+    num_workers: 2
     steps:
-      - name: Install aws cli
-        run: [brew, install, aws]
-      - name: Install pyenv
-        run: [brew, install, pyenv]
-      - name: Install vscode
-        run: [brew, cask, install, vscode]
-
-  after:
-    steps:
-      - name: Add pyenv to shell startup
-        run: [echo, $(PYENV_COMMAND), ">>", ~/.bashrc]
-      - name: Setup github keys
-        run: ["my_custom_shell_script.sh"]
+      - name: install httpie
+        run: brew install httpie
+      - name: install lynx (terminal browser)
+        run: brew install lynx
