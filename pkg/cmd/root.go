@@ -1,3 +1,5 @@
+// Package cmd configures all the cmds required by the xqtR app. The run command, created by newRunCmd(),
+// creates the main xqtR which is used to parse yaml job files and execute them.
 package cmd
 
 import (
@@ -36,7 +38,7 @@ func NewXqtRCmd() *cobra.Command {
 
 	// cli commands wire up
 	rootCmd.AddCommand(newVersionCmd())
-	rootCmd.AddCommand(newRunCmd(&xqtRConfig))
+	rootCmd.AddCommand(newRunCmd(&xqtRConfig)) // creates xqtR's core app instance to parse yaml jobs and exec them!
 
 	return rootCmd
 }
