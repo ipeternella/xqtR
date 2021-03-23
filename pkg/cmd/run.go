@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/IgooorGP/xqtR/internal/app"
 	"github.com/IgooorGP/xqtR/internal/config"
+	"github.com/IgooorGP/xqtR/internal/xqtr"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
@@ -33,8 +33,8 @@ func newRunCmd(cfg *config.XqtRConfig) *cobra.Command {
 
 func newRunCmdHandler(cfg *config.XqtRConfig) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		xqtr := app.NewXqtR(cfg)
-		xqtr.Run()
+		xqtR := xqtr.NewXqtR(cfg)
+		xqtR.Run()
 	}
 }
 

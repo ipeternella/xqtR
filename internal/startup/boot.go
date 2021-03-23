@@ -1,3 +1,5 @@
+// Package startup is used to configure basic needs of the application such as
+// logging levels, formatting, etc. XqtR app instances rely on the Boot() method.
 package startup
 
 import (

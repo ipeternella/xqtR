@@ -1,45 +1,28 @@
-package app
+package executor
 
 import (
+	"github.com/IgooorGP/xqtR/internal/dtos"
 	"github.com/rs/zerolog/log"
 )
 
-type CmdResult struct {
-	StdoutData []byte
-	StderrData []byte
-	Err        error
-}
-
-type WorkerData struct {
-	Id      int
-	JobStep JobStep
-	Debug   bool
-}
-
-type WorkerResult struct {
-	WorkerId int
-	Name     string
-	Result   *CmdResult
-}
-
-func newWorkerData(id int, jobStep JobStep, debug bool) *WorkerData {
-	return &WorkerData{
+func newWorkerData(id int, jobStep dtos.JobStep, debug bool) *dtos.WorkerData {
+	return &dtos.WorkerData{
 		Id:      id,
 		JobStep: jobStep,
 		Debug:   debug,
 	}
 }
 
-func newCmdResult(stdoutData []byte, stderrData []byte, err error) *CmdResult {
-	return &CmdResult{
+func newCmdResult(stdoutData []byte, stderrData []byte, err error) *dtos.CmdResult {
+	return &dtos.CmdResult{
 		StdoutData: stdoutData,
 		StderrData: stderrData,
 		Err:        err,
 	}
 }
 
-func newWorkerResult(workerId int, name string, cmdResult *CmdResult) *WorkerResult {
-	return &WorkerResult{
+func newWorkerResult(workerId int, name string, cmdResult *dtos.CmdResult) *dtos.WorkerResult {
+	return &dtos.WorkerResult{
 		WorkerId: workerId,
 		Name:     name,
 		Result:   cmdResult,
@@ -47,13 +30,13 @@ func newWorkerResult(workerId int, name string, cmdResult *CmdResult) *WorkerRes
 }
 
 // split jobSteps
-func executeJobStepByWorker(workerResults chan<- *WorkerResult, taskQueue <-chan *WorkerData) {
+func executeJobStepByWorker(workerResults chan<- *dtos.WorkerResult, taskQueue <-chan *dtos.WorkerData) {
 
 	// keep consuming from queue as long its opened (chan blocks if there are no tasks)
 	for workerData := range taskQueue {
 		log.Info().Msgf("⏳ step: %s", workerData.JobStep.Name)
 
-		var rslt *CmdResult
+		var rslt *dtos.CmdResult
 		cmd, cmdStdoutPipe, cmdStderrPipe := shellCommand(workerData.JobStep.Run)
 
 		// spawns a new OS process with the cmd

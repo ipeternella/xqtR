@@ -1,4 +1,6 @@
-package app
+// Package dtos contains the structs that are merely "data containers, i.e. data structures that
+// contain no logic, just bare data.
+package dtos
 
 type JobsFile struct {
 	Jobs []Job `mapstructure:"jobs"`

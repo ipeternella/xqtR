@@ -1,4 +1,6 @@
-package app
+// Package ui provides some pretty string formatting that's used to display commands results
+// such as stdout, stderr, warnings, etc.
+package ui
 
 import "github.com/rs/zerolog/log"
 
@@ -11,12 +13,12 @@ const (
 	processStderrFooter  = "\n>---------------<"
 )
 
-func printCmdFailure(stepName string, stdoutData []byte, stderrData []byte, debug bool) {
+func PrintCmdFailure(stepName string, stdoutData []byte, stderrData []byte, debug bool) {
 	log.Error().Msgf("%s%s%s", processStderrHeader, stderrData, processStderrFooter)
 	log.Fatal().Msgf("⌛ step: %s ✖️", stepName)
 }
 
-func printCmdFeedback(stepName string, stdoutData []byte, stderrData []byte, debug bool) {
+func PrintCmdFeedback(stepName string, stdoutData []byte, stderrData []byte, debug bool) {
 	// stderr is also used for warnings when the process does not exit with a non-zero status code
 	if len(stderrData) > 0 {
 		log.Warn().Msgf("%s%s%s", processWarningHeader, stderrData, processWarningFooter)

@@ -1,9 +1,10 @@
-package app
+package xqtr
 
 import (
 	"os"
 	"path/filepath"
 
+	"github.com/IgooorGP/xqtR/internal/dtos"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
@@ -21,7 +22,7 @@ func prepareViper(absJobsFilePath string) *viper.Viper {
 	return viper.GetViper() // configured viper instance
 }
 
-func parseYaml(viperParser *viper.Viper, absJobsFilePath string) *JobsFile {
+func parseYaml(viperParser *viper.Viper, absJobsFilePath string) *dtos.JobsFile {
 	// error handling when reading config
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -33,8 +34,8 @@ func parseYaml(viperParser *viper.Viper, absJobsFilePath string) *JobsFile {
 		os.Exit(1)
 	}
 
-	// yaml unmarshalling
-	yaml := NewJobsFile()
+	// yaml unmarshalling (viper requires a pointer)
+	yaml := dtos.NewJobsFile()
 	if err := viper.Unmarshal(yaml); err != nil {
 		panic(err)
 	}

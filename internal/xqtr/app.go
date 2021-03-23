@@ -1,4 +1,5 @@
-package app
+// Package xqtr provides functions to create new xqtR app instances (core of this project).
+package xqtr
 
 import (
 	"os"
@@ -6,6 +7,7 @@ import (
 	"time"
 
 	"github.com/IgooorGP/xqtR/internal/config"
+	"github.com/IgooorGP/xqtR/internal/executor"
 	"github.com/IgooorGP/xqtR/internal/startup"
 	"github.com/rs/zerolog/log"
 )
@@ -46,7 +48,7 @@ func (xqtr *XqtR) Run() {
 	yaml := parseYaml(viperParser, absJobsFilePath)
 
 	// extract jobs and create functions to invoke them
-	executeJobs(yaml, true)
+	executor.ExecuteJobs(*yaml, true) // no need for pointers from here on (no modifications on the yml)
 
 	log.Info().Msgf("Execution duration: %s", time.Since(start))
 }
