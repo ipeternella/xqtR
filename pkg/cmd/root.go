@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/IgooorGP/xqtR/internal/config"
 	"github.com/spf13/cobra"
 )
@@ -9,6 +11,7 @@ const (
 	appName      = "xqtr"
 	shortAppDesc = "xqtR is a tool that lets you run jobs on your machine."
 	longAppDesc  = "xqtR (short for executor) is a tool that parses jobs files in order to execute them to perform some tasks."
+	versionText  = "xqtR current version: %s\n"
 	version      = "1.0.0"
 )
 
@@ -26,14 +29,14 @@ func NewXqtRCmd() *cobra.Command {
 			cmd.Help() // main command just runs help
 		},
 	}
-	rootCmd.SetVersionTemplate("xqtr version is 1.0.0\n")
+	rootCmd.SetVersionTemplate(fmt.Sprintf(versionText, version))
 
 	// logging global flag
 	rootCmd.PersistentFlags().StringVar(&xqtRConfig.LogLevel, "log-level", "info", "logging verbosity: ('debug', 'info', 'warn', 'error', 'fatal')")
 
 	// cli commands wire up
 	rootCmd.AddCommand(newVersionCmd())
-	rootCmd.AddCommand(newRunCmd(&xqtRConfig)) // main xqtr command
+	rootCmd.AddCommand(newRunCmd(&xqtRConfig))
 
 	return rootCmd
 }

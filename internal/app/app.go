@@ -3,6 +3,7 @@ package app
 import (
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/IgooorGP/xqtR/internal/config"
 	"github.com/IgooorGP/xqtR/internal/startup"
@@ -26,6 +27,11 @@ func (xqtr *XqtR) Startup() {
 
 // Run is the main function for running jobs
 func (xqtr *XqtR) Run() {
+	xqtr.Startup()
+
+	start := time.Now()
+	log.Info().Msgf("xqtR is starting...")
+
 	// gets absolute file path location
 	absJobsFilePath, err := filepath.Abs(xqtr.config.JobFilePath)
 
@@ -41,4 +47,6 @@ func (xqtr *XqtR) Run() {
 
 	// extract jobs and create functions to invoke them
 	executeJobs(yaml, true)
+
+	log.Info().Msgf("Execution duration: %s", time.Since(start))
 }

@@ -1,6 +1,6 @@
 # Make variables
 BIN_OUTPUT_FOLDER := bin
-BIN_MAIN_FILE := dist
+BIN_MAIN_FILE := xqtr
 
 # Commands
 default: 

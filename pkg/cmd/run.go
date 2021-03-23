@@ -34,8 +34,6 @@ func newRunCmd(cfg *config.XqtRConfig) *cobra.Command {
 func newRunCmdHandler(cfg *config.XqtRConfig) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		xqtr := app.NewXqtR(cfg)
-
-		xqtr.Startup()
 		xqtr.Run()
 	}
 }

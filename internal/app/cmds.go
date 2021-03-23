@@ -79,9 +79,6 @@ func executeJob(job Job, debug bool) {
 
 	if job.NumWorkers > 0 {
 		numTasks := len(job.Steps)
-		log.Info().Msgf("%d", numTasks)
-
-		// var workerResults []*WorkerResult
 		workerResults := make([]*WorkerResult, numTasks)
 
 		workerResultsChan := make(chan *WorkerResult, numTasks) // buffered channel
