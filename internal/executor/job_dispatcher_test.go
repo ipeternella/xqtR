@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDispatchForSyncJob(t *testing.T) {
+func TestDispatchForSyncJobOnly(t *testing.T) {
 	// arrange - mocks
 	syncCalled := false
 	asyncCalled := false
@@ -21,7 +21,57 @@ func TestDispatchForSyncJob(t *testing.T) {
 		asyncCalled = true
 	}
 
-	yaml := tests.MockJobsFileSyncOnly()
+	yaml := tests.NewMockJobsFileWithoutNumWorkers() // sync jobs only
+	debug := true
+	dispatcher := NewJobDispatcher(syncJobExecutorMock, asyncJobExecutorMock)
+
+	// act
+	dispatcher.DispatchJobsForExecution(yaml.Jobs, debug)
+
+	// arrange
+	assert.True(t, syncCalled) // only sync jobs
+	assert.False(t, asyncCalled)
+}
+
+func TestDispatchForAsyncJobOnly(t *testing.T) {
+	// arrange - mocks
+	syncCalled := false
+	asyncCalled := false
+
+	syncJobExecutorMock := func(job dtos.Job, debug bool) {
+		syncCalled = true
+	}
+
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) {
+		asyncCalled = true
+	}
+
+	yaml := tests.NewMockJobsFileWithNumWorkers() // async job only
+	debug := true
+	dispatcher := NewJobDispatcher(syncJobExecutorMock, asyncJobExecutorMock)
+
+	// act
+	dispatcher.DispatchJobsForExecution(yaml.Jobs, debug)
+
+	// arrange
+	assert.False(t, syncCalled)
+	assert.True(t, asyncCalled) // only async jobs
+}
+
+func TestDispatchForSyncAndAsyncJobs(t *testing.T) {
+	// arrange - mocks
+	syncCalled := false
+	asyncCalled := false
+
+	syncJobExecutorMock := func(job dtos.Job, debug bool) {
+		syncCalled = true
+	}
+
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) {
+		asyncCalled = true
+	}
+
+	yaml := tests.NewMockJobsFileWithSyncAndAsyncJobs() // async job only
 	debug := true
 	dispatcher := NewJobDispatcher(syncJobExecutorMock, asyncJobExecutorMock)
 
@@ -30,5 +80,5 @@ func TestDispatchForSyncJob(t *testing.T) {
 
 	// arrange
 	assert.True(t, syncCalled)
-	assert.False(t, asyncCalled)
+	assert.True(t, asyncCalled)
 }

@@ -26,7 +26,7 @@ func NewMockJobsFile(jobs []dtos.Job) dtos.JobsFile {
 	}
 }
 
-func MockJobsFile1() dtos.JobsFile {
+func NewMockJobsFileWithSyncAndAsyncJobs() dtos.JobsFile {
 
 	job1_sync_steps := []dtos.JobStep{
 		NewMockJobStep("job1.step1", "job1.step1.run11"),
@@ -46,7 +46,7 @@ func MockJobsFile1() dtos.JobsFile {
 	return NewMockJobsFile(jobs)
 }
 
-func MockJobsFileSyncOnly() dtos.JobsFile {
+func NewMockJobsFileWithoutNumWorkers() dtos.JobsFile {
 
 	job1_sync_steps := []dtos.JobStep{
 		NewMockJobStep("job1.step1", "job1.step1.run11"),
@@ -61,7 +61,7 @@ func MockJobsFileSyncOnly() dtos.JobsFile {
 	return NewMockJobsFile(jobs)
 }
 
-func MockJobsFileAsyncOnly() dtos.JobsFile {
+func NewMockJobsFileWithNumWorkers() dtos.JobsFile {
 
 	job1_sync_steps := []dtos.JobStep{
 		NewMockJobStep("job1.step1", "job1.step1.run11"),
