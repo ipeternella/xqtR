@@ -3,6 +3,7 @@
 package startup
 
 import (
+	"io"
 	"os"
 	"time"
 
@@ -13,14 +14,16 @@ import (
 
 // Boot is a func that boots the tool by running the appropriate configurations.
 func Boot(cfg *config.XqtRConfig) {
-	setupLogger(cfg)
+	stdout := os.Stdout        // grab stdout file descriptor from the OS
+	timeFormat := time.Kitchen // timeformat
 
+	setupLogger(cfg, stdout, timeFormat)
 	log.Debug().Msg("Booting xqtR is complete.")
 }
 
-func setupLogger(cfg *config.XqtRConfig) {
+func setupLogger(cfg *config.XqtRConfig, outputStream io.Writer, timeFormat string) {
 	// zerolog's global logger setup
-	logFormat := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.Kitchen}
+	logFormat := zerolog.ConsoleWriter{Out: outputStream, TimeFormat: timeFormat}
 	log.Logger = zerolog.New(logFormat).With().Timestamp().Logger()
 	zerolog.SetGlobalLevel(config.ParseLevel(cfg.LogLevel))
 }

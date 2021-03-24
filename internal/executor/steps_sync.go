@@ -22,7 +22,6 @@ func executeJobStep(jobStep dtos.JobStep, debug bool) {
 		log.Fatal().Msgf("An error happened while starting the cmd: %s", err.Error())
 	}
 
-	// pipes must be passed by reference, naturally
 	stdoutData, stderrData := readCmdStdStreams(cmdStdoutPipe, cmdStderrPipe, debug)
 
 	// waits for cmd completion (also closes stdstreams)
