@@ -13,9 +13,14 @@ const (
 	processStderrFooter  = "\n>---------------<"
 )
 
-func PrintCmdFailure(stepName string, stdoutData []byte, stderrData []byte, debug bool) {
+func PrintCmdFailure(stepName string, stdoutData []byte, stderrData []byte, continueOnError bool) {
 	log.Error().Msgf("%s%s%s", processStderrHeader, stderrData, processStderrFooter)
-	log.Fatal().Msgf("⌛ step: %s ✖️", stepName)
+
+	if continueOnError {
+		log.Error().Msgf("⌛ step: %s ✖️", stepName) // does not end the process with status 1
+	} else {
+		log.Fatal().Msgf("⌛ step: %s ✖️", stepName) // ends process with status 1
+	}
 }
 
 func PrintCmdFeedback(stepName string, stdoutData []byte, stderrData []byte, debug bool) {

@@ -8,13 +8,12 @@ import (
 
 func ExecuteJobSync(job dtos.Job, debug bool) {
 	for _, jobStep := range job.Steps {
-		executeJobStep(jobStep, debug)
+		executeJobStep(jobStep, debug, job.ContinueOnError)
 	}
 }
 
-func executeJobStep(jobStep dtos.JobStep, debug bool) {
+func executeJobStep(jobStep dtos.JobStep, debug bool, continueOnError bool) {
 	log.Info().Msgf("⏳ step: %s", jobStep.Name)
-
 	cmd, cmdStdoutPipe, cmdStderrPipe := shellCommand(jobStep.Run)
 
 	// spawns a new OS process with the cmd
@@ -26,8 +25,8 @@ func executeJobStep(jobStep dtos.JobStep, debug bool) {
 
 	// waits for cmd completion (also closes stdstreams)
 	if err := cmd.Wait(); err != nil {
-		ui.PrintCmdFailure(jobStep.Name, stdoutData, stderrData, debug)
+		ui.PrintCmdFailure(jobStep.Name, stdoutData, stderrData, continueOnError)
+	} else {
+		ui.PrintCmdFeedback(jobStep.Name, stdoutData, stderrData, debug)
 	}
-
-	ui.PrintCmdFeedback(jobStep.Name, stdoutData, stderrData, debug)
 }

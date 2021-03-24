@@ -7,7 +7,7 @@ import (
 
 func ExecuteJobAsync(job dtos.Job, debug bool) {
 	numTasks := len(job.Steps)
-	workerResults := make([]*dtos.WorkerResult, numTasks)
+	continueOnError := job.ContinueOnError
 
 	workerResultsChan := make(chan *dtos.WorkerResult, numTasks) // buffered channel
 	taskQueue := make(chan *dtos.WorkerData)                     // unbuffered channel
@@ -30,15 +30,12 @@ func ExecuteJobAsync(job dtos.Job, debug bool) {
 
 	// collect results
 	for i := 0; i < numTasks; i++ {
-		workerResults[i] = <-workerResultsChan
-	}
-
-	for _, rslt := range workerResults {
+		rslt := <-workerResultsChan
 
 		if rslt.Result.Err != nil {
-			ui.PrintCmdFailure(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, debug)
+			ui.PrintCmdFailure(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, continueOnError)
+		} else {
+			ui.PrintCmdFeedback(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, debug)
 		}
-
-		ui.PrintCmdFeedback(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, debug)
 	}
 }

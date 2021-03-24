@@ -4,10 +4,21 @@ jobs:
       - name: brew update
         run: brew update
 
+  - title: uninstall software...
+    continue_on_error: true
+    steps:
+      - name: brew uninstall httpie
+        run: brew uninstall httpie
+      - name: brew uninstall lynx
+        run: brew uninstall lynx
+      - name: brew uninstall opera
+        run: brew uninstall opera
+
   - title: install apps with software providers...
-    num_workers: 2
     steps:
       - name: install httpie
         run: brew install httpie
-      - name: install lynx (terminal browser)
+      - name: install lynx
         run: brew install lynx
+      - name: install opera
+        run: brew install --cask opera

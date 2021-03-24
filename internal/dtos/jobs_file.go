@@ -7,9 +7,10 @@ type JobsFile struct {
 }
 
 type Job struct {
-	Title      string    `mapstructure:"title"` // job name
-	Steps      []JobStep `mapstructure:"steps"`
-	NumWorkers int       `mapstructure:"num_workers"`
+	Title           string    `mapstructure:"title"` // job name
+	Steps           []JobStep `mapstructure:"steps"`
+	NumWorkers      int       `mapstructure:"num_workers"`
+	ContinueOnError bool      `mapstructure:"continue_on_error"`
 }
 
 type JobStep struct {
