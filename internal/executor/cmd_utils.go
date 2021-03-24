@@ -33,8 +33,8 @@ func readPipe(cmdPipe *io.ReadCloser) []byte {
 }
 
 func readCmdStdStreams(cmdStdoutPipe *io.ReadCloser, cmdStderrPipe *io.ReadCloser, readStdout bool) ([]byte, []byte) {
-	var stdoutData []byte
-	var stderrData []byte
+	var stdoutData = []byte("")
+	var stderrData = []byte("")
 
 	if readStdout {
 		stdoutData = readPipe(cmdStdoutPipe)

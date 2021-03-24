@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/IgooorGP/xqtR/internal/dtos"
-	"github.com/IgooorGP/xqtR/internal/tests"
+	"github.com/IgooorGP/xqtR/internal/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ func TestDispatchForSyncJobOnly(t *testing.T) {
 		asyncCalled = true
 	}
 
-	yaml := tests.NewMockJobsFileWithoutNumWorkers() // sync jobs only
+	yaml := testutils.NewMockJobsFileWithoutNumWorkers() // sync jobs only
 	debug := true
 	dispatcher := NewJobDispatcher(syncJobExecutorMock, asyncJobExecutorMock)
 
@@ -46,7 +46,7 @@ func TestDispatchForAsyncJobOnly(t *testing.T) {
 		asyncCalled = true
 	}
 
-	yaml := tests.NewMockJobsFileWithNumWorkers() // async job only
+	yaml := testutils.NewMockJobsFileWithNumWorkers() // async job only
 	debug := true
 	dispatcher := NewJobDispatcher(syncJobExecutorMock, asyncJobExecutorMock)
 
@@ -71,7 +71,7 @@ func TestDispatchForSyncAndAsyncJobs(t *testing.T) {
 		asyncCalled = true
 	}
 
-	yaml := tests.NewMockJobsFileWithSyncAndAsyncJobs() // async job only
+	yaml := testutils.NewMockJobsFileWithSyncAndAsyncJobs() // async job only
 	debug := true
 	dispatcher := NewJobDispatcher(syncJobExecutorMock, asyncJobExecutorMock)
 
