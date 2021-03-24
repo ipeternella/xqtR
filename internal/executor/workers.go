@@ -41,7 +41,7 @@ func executeJobStepByWorker(workerResults chan<- *dtos.WorkerResult, taskQueue <
 
 		// spawns a new OS process with the cmd
 		if err := cmd.Start(); err != nil {
-			log.Fatal().Msgf("An error happened while starting the cmd", err.Error())
+			log.Fatal().Msgf("An error happened while starting the cmd: %s", err.Error())
 		}
 
 		stdoutData, stderrData := readCmdStdStreams(cmdStdoutPipe, cmdStderrPipe, workerData.Debug)
