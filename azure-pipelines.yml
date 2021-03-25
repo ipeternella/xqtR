@@ -19,7 +19,7 @@ variables:
 jobs:
 - job: PushRequests
   container: linux_1604
-  condition: neq(variables['Build.Reason'], 'PullRequest')
+  condition: ne(variables['Build.Reason'], 'PullRequest')
   continueOnError: false
   
   steps:
