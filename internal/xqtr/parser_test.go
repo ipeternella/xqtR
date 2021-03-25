@@ -1,11 +1,22 @@
 package xqtr
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/IgooorGP/xqtR/internal/config"
+	"github.com/IgooorGP/xqtR/internal/startup"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMain(m *testing.M) {
+	cfg := config.NewXqtRConfigWithDefaults()
+	startup.Boot(&cfg) // log level as info
+
+	code := m.Run()
+	os.Exit(code)
+}
 
 const (
 	brokenYamlFolderPath = "../testutils/testdata/" // move out of 'xqtr' pkg folder

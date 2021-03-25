@@ -10,4 +10,7 @@ build:
 	@go build -o $(BIN_OUTPUT_FOLDER)/$(BIN_MAIN_FILE) -v cmd/xqtr/*.go
 
 tests: 
-	@go test ./... -cover ./... -v
+	@go test ./... -coverprofile=coverage.out
+
+testscover:
+	@make tests && go tool cover -html=coverage.out

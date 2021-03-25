@@ -1,12 +1,23 @@
 package executor
 
 import (
+	"os"
 	"testing"
 
+	"github.com/IgooorGP/xqtR/internal/config"
 	"github.com/IgooorGP/xqtR/internal/dtos"
+	"github.com/IgooorGP/xqtR/internal/startup"
 	"github.com/IgooorGP/xqtR/internal/testutils"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMain(m *testing.M) {
+	cfg := config.NewXqtRConfigWithDefaults()
+	startup.Boot(&cfg) // log level as info
+
+	code := m.Run()
+	os.Exit(code)
+}
 
 func TestDispatchForSyncJobOnly(t *testing.T) {
 	// arrange - mocks
