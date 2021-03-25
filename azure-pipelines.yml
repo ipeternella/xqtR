@@ -8,7 +8,8 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  CERT_FOLDER: /usr/local/share/ca-certificates  
+  # CERT_FOLDER: /usr/local/share/ca-certificates
+  CERT_FOLDER: /etc/ssl/certs
 
 # --- Triggers --- #
 trigger:
