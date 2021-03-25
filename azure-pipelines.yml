@@ -11,8 +11,11 @@ variables:
   BIN_OUTPUT_NAME: xqtr
 
 jobs:
-  - job: PreRequisitesJob
-    displayName: Prerequisites Job
+  - job: PushJob
+    displayName: Push Job
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+    continueOnError: false
+    
     steps:
       - task: GoTool@0
         displayName:  Install GO
@@ -28,14 +31,6 @@ jobs:
           extraProperties: |
             sonar.projectKey=$(SONAR_PROJECT_KEY)
             sonar.host.url=https://sonarcloud.io
-
-  - job: PushJob
-    displayName: Push Job
-    condition: ne(variables['Build.Reason'], 'PullRequest')
-    dependsOn: PreRequisitesJob
-    continueOnError: false
-    
-    steps:
       - task: Go@0
         inputs:
           command: 'build'
@@ -60,10 +55,23 @@ jobs:
   - job: PullRequestJob
     displayName: Pull Request Job
     condition: eq(variables['Build.Reason'], 'PullRequest')
-    dependsOn: PreRequisitesJob
     continueOnError: false
 
     steps: 
+      - task: GoTool@0
+        displayName:  Install GO
+        inputs:
+          version: '1.16'
+      - task: SonarCloudPrepare@1
+        displayName: Prepare Analysis on SonarCloud
+        inputs:
+          SonarCloud: 'ipeternella-personal-token'
+          organization: 'igp'
+          scannerMode: 'CLI'
+          configMode: 'file'
+          extraProperties: |
+            sonar.projectKey=$(SONAR_PROJECT_KEY)
+            sonar.host.url=https://sonarcloud.io
       - task: Go@0
         displayName: Runs tests with coverage
         inputs:
