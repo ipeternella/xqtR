@@ -1,8 +1,14 @@
-trigger:
-- main
+# Some container definitions
+resources:
+ containers:
+   - container: linux_1604
+     image: ubuntu:16.04
 
 pool:
   vmImage: ubuntu-latest
+
+trigger:
+- main
 
 variables:
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
@@ -10,17 +16,21 @@ variables:
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
-# Some container definitions
-resources:
- containers:
-   - container: linux_1604
-     image: ubuntu:16.04
-
 jobs:
-- job: JobWithContainers
+- job: PushRequests
   container: linux_1604
+  condition: neq(variables['Build.Reason'], 'PullRequest')
   continueOnError: false
   
   steps:
   - bash: |
-      echo "hello world!"
+      echo "Hi from a push!"
+
+- job: PullRequests
+  container: linux_1604
+  continueOnError: false
+  condition: eq(variables['Build.Reason'], 'PullRequest')
+
+  steps:
+  - bash: |
+      echo "Hi from a pr!"
