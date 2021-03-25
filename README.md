@@ -1,5 +1,14 @@
 # 🛠️ xqtR (executoR) 🛠️
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=alert_status)](https://sonarcloud.io/dashboard?id=xqtR)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=xqtR)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=security_rating)](https://sonarcloud.io/dashboard?id=xqtR)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=xqtR)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=coverage)](https://sonarcloud.io/dashboard?id=xqtR)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=xqtR)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=bugs)](https://sonarcloud.io/dashboard?id=xqtR)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=code_smells)](https://sonarcloud.io/dashboard?id=xqtR)
+
 `xqtR` (short for executor) is a command line tool to execute a series of jobs specified by job yaml files. The steps in a job can be run concurrently (by spawning goroutines in a workpool) or in the old fashioned sync way (default).
 
 A quick demo of running a `job.yaml` which contains a job whose steps will be run by a single main goroutine (sync):
