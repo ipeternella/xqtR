@@ -1,0 +1,29 @@
+# all fine in this yaml!
+jobs:
+  - title: job 1
+    continue_on_error: false
+    steps:
+      - name: task 11
+        run: echo "task 11"
+      - name: task 12
+        run: echo "task 12"
+      - name: task 13
+        run: echo "task 13"
+
+  - title: job 2
+    continue_on_error: true
+    steps:
+      - name: task 21
+        run: echo "task 21"
+      - name: task 22
+        run: echo "task 22"
+
+  - title: job 3
+    num_workers: 5
+    steps:
+      - name: task 31
+        run: echo "task 31"
+      - name: task 32
+        run: echo "task 32"
+      - name: sleep 3
+        run: echo "task 33"
