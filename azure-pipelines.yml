@@ -50,3 +50,6 @@ jobs:
     inputs:
       command: 'custom'
       customCommand: 'version'
+  - bash: |
+      make -v
+    displayName: Make version
