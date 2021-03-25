@@ -1,4 +1,4 @@
-# Some container definitions
+# --- External resources --- #
 resources:
  containers:
    - container: linux_1604
@@ -7,30 +7,46 @@ resources:
 pool:
   vmImage: ubuntu-latest
 
+# --- Triggers --- #
 trigger:
 - main
 
+pr:
+- main
+
+# --- Variables --- #
 variables:
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
   GOROOT: '/usr/local/go1.11' # Go installation path
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
+# --- Jobs --- #
 jobs:
 - job: PushRequests
-  container: linux_1604
   condition: ne(variables['Build.Reason'], 'PullRequest')
+  container: linux_1604
   continueOnError: false
   
   steps:
   - bash: |
       echo "Hi from a push!"
+  - task: GoTool@0
+    inputs:
+      version: '1.16'
 
 - job: PullRequests
+  condition: eq(variables['Build.Reason'], 'PullRequest')
   container: linux_1604
   continueOnError: false
-  condition: eq(variables['Build.Reason'], 'PullRequest')
 
   steps:
   - bash: |
-      echo "Hi from a pr!"
+      echo "Hi from a PR!"
+  - task: GoTool@0
+    inputs:
+      version: '1.16'
+  - task: Go@0
+    inputs:
+      command: 'custom'
+      customCommand: 'version'
