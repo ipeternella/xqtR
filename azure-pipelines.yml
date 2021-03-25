@@ -1,82 +1,73 @@
-# --- External resources --- #
-resources:
- containers:
-   - container: linux_1604
-     image: ubuntu:16.04
-
 pool:
   vmImage: ubuntu-latest
 
-variables:
-  # CERT_FOLDER: /usr/local/share/ca-certificates
-  CERT_FOLDER: /etc/ssl/certs
-
-# --- Triggers --- #
 trigger:
-- main
+  - main
 
 pr:
-- main
+  - main
 
-# --- Jobs --- #
+variables:
+  BIN_OUTPUT_NAME: xqtr
+
 jobs:
-- job: PushRequests
-  condition: ne(variables['Build.Reason'], 'PullRequest')
-  # container: linux_1604
-  continueOnError: false
-  
-  steps:
-  - bash: |
-      echo "Hi from a push!"
-  - task: GoTool@0
-    inputs:
-      version: '1.16'
+  - job: PreRequisitesJob
+    displayName: Prerequisites Job
+    steps:
+      - task: GoTool@0
+        displayName:  Install GO
+        inputs:
+          version: '1.16'
+      - task: SonarCloudPrepare@1
+        displayName: Prepare Analysis on SonarCloud
+        inputs:
+          SonarCloud: 'ipeternella-personal-token'
+          organization: 'igp'
+          scannerMode: 'CLI'
+          configMode: 'file'
+          extraProperties: |
+            sonar.projectKey=$(SONAR_PROJECT_KEY)
+            sonar.host.url=https://sonarcloud.io
 
-- job: PullRequests
-  condition: eq(variables['Build.Reason'], 'PullRequest')
-  # container: linux_1604
-  continueOnError: false
+  - job: PushJob
+    displayName: Push Job
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+    dependsOn: PreRequisitesJob
+    continueOnError: false
+    
+    steps:
+      - task: Go@0
+        inputs:
+          command: 'build'
+          arguments: '-o $(Build.ArtifactStagingDirectory)/xqtr $(Build.SourcesDirectory)/cmd/xqtr/*.go'
+      - task: GitHubRelease@1
+        inputs:
+          gitHubConnection: 'ipeternella-personal-azuredevops-token'
+          repositoryName: '$(Build.Repository.Name)'
+          action: 'create'
+          target: '$(Build.SourceVersion)'
+          tagSource: 'gitTag'
+          title: 'xqtR bin'
+          releaseNotesSource: 'inline'
+          releaseNotesInline: |
+            # xqtR (executoR)
+            
+            This release contains the compiled binary of the xqtR command line tool which can be used by users.
+          assets: '$(Build.ArtifactStagingDirectory)/xqtr'
+          changeLogCompareToRelease: 'lastFullRelease'
+          changeLogType: 'commitBased'
 
-  steps:
-  - bash: |
-      echo "Hi from a PR!"
-  - task: GoTool@0
-    displayName:  Install GO
-    inputs:
-      version: '1.16'
-  - task: Go@0
-    displayName: Runs GO version
-    inputs:
-      command: 'custom'
-      customCommand: 'version'
-  - task: SonarCloudPrepare@1
-    displayName: Prepare Analysis on SonarCloud
-    inputs:
-      SonarCloud: 'ipeternella-personal-token'
-      organization: 'igp'
-      scannerMode: 'CLI'
-      configMode: 'file'
-      extraProperties: |
-        sonar.projectKey=$(SONAR_PROJECT_KEY)
-        sonar.host.url=https://sonarcloud.io
-  # - bash: |
-  #     # install apt-get cert commands
-  #     apt-get update 
-  #     apt-get install ca-certificates -y
-  #     # Create cert folder
-  #     mkdir -p /usr/local/share/ca-certificates
-  #     # Get certificate from "github.com"
-  #     openssl s_client -showcerts -connect github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > $(CERT_FOLDER)/github.crt
-  #     # Get certificate from "proxy.golang.org"
-  #     openssl s_client -showcerts -connect proxy.golang.org:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > $(CERT_FOLDER)/proxy.golang.crt
-  #     # Update certificates
-  #     update-ca-certificates
-  #   displayName: Download certificates
+  - job: PullRequestJob
+    displayName: Pull Request Job
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    dependsOn: PreRequisitesJob
+    continueOnError: false
 
-  - task: Go@0
-    displayName: Runs tests with coverage
-    inputs:
-      command: 'test'
-      arguments: './... -coverprofile=coverage.out'
-  - task: SonarCloudAnalyze@1
-    displayName: Run Code Analysis
+    steps: 
+      - task: Go@0
+        displayName: Runs tests with coverage
+        inputs:
+          command: 'test'
+          arguments: './... -coverprofile=coverage.out'
+      - task: SonarCloudAnalyze@1
+        displayName: Run Code Analysis
