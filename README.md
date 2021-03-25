@@ -10,8 +10,6 @@ Now, a similar `job.yaml` which runs the same steps but spawns goroutines (async
 
 ![xqtR async demo](docs/demos/xqtr-async-demo.gif)
 
-This project is a WIP.
-
 ## Table of Contents
 
 - [Introduction](#Introduction)

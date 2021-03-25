@@ -3,6 +3,7 @@ package executor
 import (
 	"io"
 	"io/ioutil"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -76,6 +77,6 @@ func TestShouldCreateShellCommand(t *testing.T) {
 	// assert
 	expectedArgs := []string{"bash", "-c", "echo \"hello world!\""}
 
-	assert.Equal(t, "/bin/bash", shellCmd.Path)  // bash is the shell to execute the cmd
+	assert.Regexp(t, regexp.MustCompile(`(/bin/bash|/usr/bin/bash)`), shellCmd.Path)
 	assert.Equal(t, expectedArgs, shellCmd.Args) // bash is the shell to execute the cmd
 }
