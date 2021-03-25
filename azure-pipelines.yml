@@ -22,7 +22,7 @@ pr:
 jobs:
 - job: PushRequests
   condition: ne(variables['Build.Reason'], 'PullRequest')
-  container: linux_1604
+  # container: linux_1604
   continueOnError: false
   
   steps:
@@ -59,14 +59,14 @@ jobs:
       extraProperties: |
         sonar.projectKey=$(SONAR_PROJECT_KEY)
         sonar.host.url=https://sonarcloud.io
-  - bash: |
-      # Get certificate from "github.com"
-      openssl s_client -showcerts -connect github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > $(CERT_FOLDER)/github.crt
-      # Get certificate from "proxy.golang.org"
-      openssl s_client -showcerts -connect proxy.golang.org:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > $(CERT_FOLDER)/proxy.golang.crt
-      # Update certificates
-      update-ca-certificates
-    displayName: Download certificates
+  # - bash: |
+  #     # Get certificate from "github.com"
+  #     openssl s_client -showcerts -connect github.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > $(CERT_FOLDER)/github.crt
+  #     # Get certificate from "proxy.golang.org"
+  #     openssl s_client -showcerts -connect proxy.golang.org:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > $(CERT_FOLDER)/proxy.golang.crt
+  #     # Update certificates
+  #     update-ca-certificates
+  #   displayName: Download certificates
 
   - task: Go@0
     displayName: Runs tests with coverage
