@@ -6,19 +6,21 @@ import (
 )
 
 func ExecuteJobAsync(job dtos.Job, debug bool) {
-	numTasks := len(job.Steps)
 	continueOnError := job.ContinueOnError
+	numTasks := len(job.Steps)
 
 	workerResultsChan := make(chan *dtos.WorkerResult, numTasks) // buffered channel
 	taskQueue := make(chan *dtos.WorkerData)                     // unbuffered channel
 	taskId := 0
 
-	// spawn NumWorkers goroutines that are initially blocked (no tasks)
+	// spawn NumWorkers goroutines that are initially blocked (no tasks).
+	// workers receive a read-only <-chan taskQueue to consume the steps of a given job and
+	// a write-only chan<- workerResultsChan to publish the step command results
 	for workerId := 1; workerId <= job.NumWorkers; workerId++ {
 		go executeJobStepByWorker(workerResultsChan, taskQueue)
 	}
 
-	// publish tasks to workers
+	// publish tasks (the job steps commands) to workers
 	for _, jobStep := range job.Steps {
 		taskId++
 		workerData := newWorkerData(taskId, jobStep, debug)
