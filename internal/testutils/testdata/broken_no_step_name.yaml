@@ -1,0 +1,24 @@
+jobs:
+  - title: job 1
+    steps:
+      - name: task 11
+        run: echo "task 11"
+      - name: task 12
+        run: echo "task 12"
+      - run: echo "task 13" # <-- no name for step
+
+  - title: job 2
+    steps:
+      - name: task 21
+        run: echo "task 21"
+      - name: task 22
+        run: echo "task 22"
+
+  - title: job 3
+    steps:
+      - name: task 31
+        run: echo "task 31"
+      - name: task 32
+        run: echo "task 32"
+      - name: sleep 3
+        run: echo "task 33"
