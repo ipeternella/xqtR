@@ -47,6 +47,11 @@ func (xqtr *XqtR) Run() {
 	viperParser := prepareViper(absJobsFilePath)
 	yaml := parseYaml(viperParser, absJobsFilePath)
 
+	// yaml schema validation
+	if err := validateYamlSchema(yaml); err != nil {
+		log.Fatal().Msgf("yaml structure error: %s", err.Error()) // status code 1
+	}
+
 	// extract jobs and create functions to invoke them
 	executor.ExecuteJobs(*yaml, true) // no need for pointers from here on (no modifications on the yml)
 

@@ -39,12 +39,7 @@ func parseYaml(viperParser *viper.Viper, absJobsFilePath string) *dtos.JobsFile 
 	// yaml unmarshalling (viper requires a pointer)
 	yaml := dtos.NewJobsFile()
 	if err := viper.Unmarshal(yaml); err != nil {
-		panic(err)
-	}
-
-	// yaml schema validation
-	if err := validateYamlSchema(yaml); err != nil {
-		log.Fatal().Msgf("yaml structure error: %s", err.Error()) // status code 1
+		log.Fatal().Msgf("An error occured while unmarshaling yaml config: %s", err.Error())
 	}
 
 	return yaml
