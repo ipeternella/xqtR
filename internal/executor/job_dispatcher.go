@@ -4,7 +4,6 @@ package executor
 
 import (
 	"github.com/IgooorGP/xqtR/internal/dtos"
-	"github.com/rs/zerolog/log"
 )
 
 type JobExecutor func(job dtos.Job, debug bool)
@@ -28,8 +27,6 @@ func (dispatcher JobDispatcher) DispatchForExecution(job dtos.Job, debug bool) {
 // job given by the job yaml file.
 func (dispatcher JobDispatcher) DispatchJobsForExecution(jobs []dtos.Job, debug bool) {
 	for _, job := range jobs {
-		log.Info().Msgf("📝 job: %s", job.Title)
-
 		dispatcher.DispatchForExecution(job, debug)
 	}
 }

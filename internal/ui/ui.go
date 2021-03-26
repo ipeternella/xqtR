@@ -14,16 +14,17 @@ const (
 )
 
 func PrintCmdFailure(stepName string, stdoutData []byte, stderrData []byte, continueOnError bool) {
+	log.Error().Msgf("⌛ step: %s 💀", stepName)
 	log.Error().Msgf("%s%s%s", processStderrHeader, stderrData, processStderrFooter)
 
-	if continueOnError {
-		log.Error().Msgf("⌛ step: %s ✖️", stepName) // does not end the process with status 1
-	} else {
-		log.Fatal().Msgf("⌛ step: %s ✖️", stepName) // ends process with status 1
+	if !continueOnError {
+		log.Fatal().Msg("Step has failed and 'continue_on_error' is false. Exiting...")
 	}
 }
 
 func PrintCmdFeedback(stepName string, stdoutData []byte, stderrData []byte, debug bool) {
+	log.Info().Msgf("⌛ step: %s 👍", stepName)
+
 	// stderr is also used for warnings when the process does not exit with a non-zero status code
 	if len(stderrData) > 0 {
 		log.Warn().Msgf("%s%s%s", processWarningHeader, stderrData, processWarningFooter)
@@ -33,6 +34,4 @@ func PrintCmdFeedback(stepName string, stdoutData []byte, stderrData []byte, deb
 	if debug && len(stdoutData) > 0 {
 		log.Debug().Msgf("%s%s%s", processStdoutHeader, stdoutData, processStdoutFooter)
 	}
-
-	log.Info().Msgf("⌛ step: %s ✓", stepName)
 }

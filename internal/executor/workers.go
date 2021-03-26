@@ -31,10 +31,9 @@ func newWorkerResult(workerId int, name string, cmdResult *dtos.CmdResult) *dtos
 
 // split jobSteps
 func executeJobStepByWorker(workerResults chan<- *dtos.WorkerResult, taskQueue <-chan *dtos.WorkerData) {
-
 	// keep consuming from queue as long its opened (chan blocks if there are no tasks)
 	for workerData := range taskQueue {
-		log.Info().Msgf("⏳ step: %s", workerData.JobStep.Name)
+		// log.Info().Msgf("⏳ step: %s", workerData.JobStep.Name)
 
 		var rslt *dtos.CmdResult
 		cmd, cmdStdoutPipe, cmdStderrPipe := shellCommand(workerData.JobStep.Run)

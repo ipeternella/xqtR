@@ -32,7 +32,7 @@ func (xqtr *XqtR) Run() {
 	xqtr.Startup()
 
 	start := time.Now()
-	log.Info().Msgf("xqtR is starting...")
+	log.Info().Msgf("🛠️  xqtR is starting...")
 
 	// gets absolute file path location
 	absJobsFilePath, err := filepath.Abs(xqtr.config.JobFilePath)
@@ -55,5 +55,5 @@ func (xqtr *XqtR) Run() {
 	// extract jobs and create functions to invoke them
 	executor.ExecuteJobs(*yaml, true) // no need for pointers from here on (no modifications on the yml)
 
-	log.Info().Msgf("Execution duration: %s", time.Since(start))
+	log.Info().Msgf("🛠️  xqtR is all done! Total duration: %s", time.Since(start))
 }
