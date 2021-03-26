@@ -37,8 +37,7 @@ The name of this project was inspired on the retired Norwegian professional coun
 
 Hence, this project is inspired by modern CICD tools such as `Azure DevOps` and `Github Actions` that use `yaml` files to configure a sequence of steps known as pipelines. Naturally, this is an ultra-and-I-really-mean-it-simplifed-version of these famous yaml parsers to run jobs! And yes, this project was also used to explore some concurrency in GO.
 
-However, besides being simple, this tool can be useful in cases like configuring new machines in which a sequence of programs must be downloaded and installed
-(and this can be done in concurrently here, which can speed up the process!).
+However, besides being simple, this tool can be useful in cases like configuring new machines in which a sequence of programs must be downloaded and installed (also, maybe some steps can be run concurrently... just be careful that package managers such as `brew` will can detect other `brew` processes and raise errors in these situations). Also, beware of race conditions (as usual) when using async jobs with many goroutines as, for example, if for a given job `num_workers: 3` is set to 3, then 3 possibly parallel processes can end up trying to the same file and without any synchronization primitives, this could generate unexpected results.
 
 ## How does it work
 
