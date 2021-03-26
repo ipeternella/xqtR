@@ -16,7 +16,7 @@ type JobDispatcher struct {
 // DispatchForExecution uses the defined `num_workers` from the yaml file to run a job
 // synchronously or asynchronously with more goroutines.
 func (dispatcher JobDispatcher) DispatchForExecution(job dtos.Job, debug bool) {
-	if job.NumWorkers > 0 {
+	if job.NumWorkers > 1 {
 		dispatcher.ExecuteJobAsync(job, debug)
 	} else {
 		dispatcher.ExecuteJobSync(job, debug)
