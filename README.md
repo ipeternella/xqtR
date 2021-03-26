@@ -13,13 +13,13 @@
 
 A quick demo of running a `job.yaml` which contains a job whose steps will be run by a single main goroutine (sync):
 
-![xqtR sync demo](docs/demos/xqtr-sync-demo.gif)
+![xqtR sync demo](docs/demos/xqtr-sync-demo-debug.gif)
 
 Now, a similar `job.yaml` which runs the same steps but spawns goroutines (async) to run the steps in parallel (when possible) according to `num_workers` in the yaml file:
 
 ![xqtR async demo](docs/demos/xqtr-async-demo.gif)
 
-The name of this project was inspired on the retired Norwegian professional counter-strike player: `XeqtR` (yes, I miss old cs times :laugh)!
+The name of this project was inspired on the retired Norwegian professional counter-strike player: `XeqtR` (yes, I miss old cs times)!
 
 ## Table of Contents
 
@@ -37,7 +37,9 @@ The name of this project was inspired on the retired Norwegian professional coun
 
 Hence, this project is inspired by modern CICD tools such as `Azure DevOps` and `Github Actions` that use `yaml` files to configure a sequence of steps known as pipelines. Naturally, this is an ultra-and-I-really-mean-it-simplifed-version of these famous yaml parsers to run jobs! And yes, this project was also used to explore some concurrency in GO.
 
-However, besides being simple, this tool can be useful in cases like configuring new machines in which a sequence of programs must be downloaded and installed (also, maybe some steps can be run concurrently... just be careful that package managers such as `brew` will can detect other `brew` processes and raise errors in these situations). Also, beware of race conditions (as usual) when using async jobs with many goroutines as, for example, if for a given job `num_workers: 3` is set to 3, then 3 possibly parallel processes can end up trying to the same file and without any synchronization primitives, this could generate unexpected results.
+However, besides being simple, this tool can be useful in cases like configuring new machines in which a sequence of programs must be downloaded and installed (also, maybe some steps can be run concurrently... just be careful that package managers such as `brew` will can detect other `brew` processes and raise errors in these situations). Also, beware of race conditions (as usual) when using async jobs with many goroutines! For example, if for a given job `num_workers: 3` is set to three, then three possibly parallel processes can end up trying to write to a same file which will generate unexpected results/errors.
+
+As a rule of thumb: when in doubt if concurrent processes can be damaging, just do not specify the `num_workers` key as the job's steps will run in a sync and safe way.
 
 ## How does it work
 
@@ -50,8 +52,7 @@ Here's the full job yaml concepts:
 - Steps are composed of **run instructions**
 - Run instructions are commands that will be executed on your system shell (bash only for now)
 
-The spawned processes are plugged to os pipes that captures their `stdstreams` (`stdout` and `stderr`) which can be used to display errors,
-warnings, or the command's `stdout` when the tool's `--log-level` is set to `debug`.
+The spawned processes are plugged to os pipes that captures their `stdstreams` (`stdout` and `stderr`) which can be used to display errors, warnings, or the command's `stdout` when the tool's `--log-level` is set to `debug`.
 
 ## How to use
 
