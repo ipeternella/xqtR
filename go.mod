@@ -3,6 +3,7 @@ module github.com/IgooorGP/xqtR
 go 1.14
 
 require (
+	github.com/briandowns/spinner v1.12.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
