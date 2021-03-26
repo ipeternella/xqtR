@@ -1,0 +1,11 @@
+jobs:
+  - title: running async sleeps
+    num_workers: 3
+    continue_on_error: true
+    steps:
+      - name: sleep 1
+        run: sleep 1 && echo "slept for 1s"
+      - name: sleep 3
+        run: sleep 3 && echo "slept for 2s"
+      - name: sleep 5
+        run: unknown cmd 5 && echo "slept for 3s" # <-- fails: unknown cmd
