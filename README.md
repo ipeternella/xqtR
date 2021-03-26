@@ -9,15 +9,17 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=bugs)](https://sonarcloud.io/dashboard?id=xqtR)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=xqtR&metric=code_smells)](https://sonarcloud.io/dashboard?id=xqtR)
 
+![xqtR logo](docs/img/xqtr-logo.png)
+
 `xqtR` (short for executor) is a command line tool to execute a series of jobs specified by job yaml files. The steps in a job can be run concurrently (by spawning goroutines in a workpool) or in the old fashioned sync way (default).
 
 A quick demo of running a `job.yaml` which contains a job whose steps will be run by a single main goroutine (sync):
 
-![xqtR sync demo](docs/demos/xqtr-sync-demo-debug.gif)
+![xqtR sync gif](docs/gif/xqtr-sync-debug.gif)
 
 Now, a similar `job.yaml` which runs the same steps but spawns goroutines (async) to run the steps in parallel (when possible) according to `num_workers` in the yaml file:
 
-![xqtR async demo](docs/demos/xqtr-async-demo.gif)
+![xqtR async gif](docs/gif/xqtr-async.gif)
 
 The name of this project was inspired on the retired Norwegian professional counter-strike player: `XeqtR` (yes, I miss old cs times)!
 
@@ -42,6 +44,8 @@ However, besides being simple, this tool can be useful in cases like configuring
 As a rule of thumb: when in doubt if concurrent processes can be damaging, just do not specify the `num_workers` key as the job's steps will run in a sync and safe way.
 
 ## How does it work
+
+![xqtR steps](docs/img/xqtr-gophers-steps.png)
 
 `xqtR` parses yaml files looking for **jobs** that are composed of a series of **steps**. Each step contains commands that, in the current version, are read and used to spawn new OS processes which will invoke the system shell (currently only `bash` -- so Windows users be warned for now) in order to execute them.
 
