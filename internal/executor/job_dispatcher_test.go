@@ -24,12 +24,22 @@ func TestDispatchForSyncJobOnly(t *testing.T) {
 	syncCalled := false
 	asyncCalled := false
 
-	syncJobExecutorMock := func(job dtos.Job, debug bool) {
+	syncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+		var mockJobSteps []dtos.JobStep
 		syncCalled = true
+
+		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
+
+		return dtos.NewEmptyJobResult(mockResult)
 	}
 
-	asyncJobExecutorMock := func(job dtos.Job, debug bool) {
-		asyncCalled = true
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+		var mockJobSteps []dtos.JobStep
+		syncCalled = true
+
+		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
+
+		return dtos.NewEmptyJobResult(mockResult)
 	}
 
 	yaml := testutils.NewMockJobsFileWithoutNumWorkers() // sync jobs only
@@ -49,12 +59,22 @@ func TestDispatchForAsyncJobOnly(t *testing.T) {
 	syncCalled := false
 	asyncCalled := false
 
-	syncJobExecutorMock := func(job dtos.Job, debug bool) {
+	syncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+		var mockJobSteps []dtos.JobStep
 		syncCalled = true
+
+		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
+
+		return dtos.NewEmptyJobResult(mockResult)
 	}
 
-	asyncJobExecutorMock := func(job dtos.Job, debug bool) {
-		asyncCalled = true
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+		var mockJobSteps []dtos.JobStep
+		syncCalled = true
+
+		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
+
+		return dtos.NewEmptyJobResult(mockResult)
 	}
 
 	yaml := testutils.NewMockJobsFileWithNumWorkers() // async job only
@@ -74,12 +94,22 @@ func TestDispatchForSyncAndAsyncJobs(t *testing.T) {
 	syncCalled := false
 	asyncCalled := false
 
-	syncJobExecutorMock := func(job dtos.Job, debug bool) {
+	syncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+		var mockJobSteps []dtos.JobStep
 		syncCalled = true
+
+		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
+
+		return dtos.NewEmptyJobResult(mockResult)
 	}
 
-	asyncJobExecutorMock := func(job dtos.Job, debug bool) {
-		asyncCalled = true
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+		var mockJobSteps []dtos.JobStep
+		syncCalled = true
+
+		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
+
+		return dtos.NewEmptyJobResult(mockResult)
 	}
 
 	yaml := testutils.NewMockJobsFileWithSyncAndAsyncJobs() // async job only

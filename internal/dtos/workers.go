@@ -7,13 +7,25 @@ type CmdResult struct {
 }
 
 type WorkerData struct {
-	Id      int
-	JobStep JobStep
-	Debug   bool
+	StepId            int
+	JobStep           JobStep
+	JobExecutionRules JobExecutionRules
 }
 
-type WorkerResult struct {
-	WorkerId int
-	Name     string
-	Result   *CmdResult
+// type WorkerResult struct {
+// 	StepId int
+// 	Name   string // jobStep name
+// 	Result *CmdResult
+// }
+
+type JobExecutionRules struct {
+	Debug           bool
+	ContinueOnError bool
+}
+
+func NewJobExecutionRules(debug bool, continueOnError bool) JobExecutionRules {
+	return JobExecutionRules{
+		Debug:           debug,
+		ContinueOnError: continueOnError,
+	}
 }

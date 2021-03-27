@@ -26,6 +26,28 @@ func NewMockJobsFile(jobs []dtos.Job) dtos.JobsFile {
 	}
 }
 
+func NewJobsFileWithTwoSyncTasks() dtos.JobsFile {
+	job1 := []dtos.JobStep{
+		NewMockJobStep(`echo "hello world"`, `echo "hello world"`),
+		NewMockJobStep(`echo "hi there"`, `echo "hi there"`),
+	}
+
+	job2 := []dtos.JobStep{
+		NewMockJobStep("sleep for 1s", "sleep 1s"),
+	}
+
+	jobs := []dtos.Job{
+		NewMockJob("echoing to stdout", job1, 0), // sync job
+		NewMockJob("sleeping 1s", job2, 0),       // sync job
+	}
+
+	// no continuing upon errors
+	jobs[0].ContinueOnError = false
+	jobs[1].ContinueOnError = false
+
+	return NewMockJobsFile(jobs)
+}
+
 func NewMockJobsFileWithSyncAndAsyncJobs() dtos.JobsFile {
 
 	job1 := []dtos.JobStep{

@@ -12,21 +12,24 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ExecuteJobAsync(job dtos.Job, debug bool) {
+func ExecuteJobAsync(job dtos.Job, debug bool) *dtos.JobResult {
 	log.Info().Msgf("📝 job: %s", job.Title)
+
+	jobResult := dtos.NewEmptyJobResult(job)
+	jobExecutionRules := dtos.NewJobExecutionRules(debug, job.ContinueOnError)
 
 	continueOnError := job.ContinueOnError
 	numTasks := len(job.Steps)
 
-	workerResultsChan := make(chan *dtos.WorkerResult, numTasks) // buffered channel
-	taskQueue := make(chan *dtos.WorkerData)                     // unbuffered channel
-	taskId := 0
+	workerJobStepResultsChan := make(chan *dtos.JobStepResult, numTasks) // buffered channel
+	taskQueue := make(chan *dtos.WorkerData)                             // unbuffered channel
+	stepId := 0
 
 	// spawn NumWorkers goroutines that are initially blocked (no tasks).
 	// workers receive a read-only <-chan taskQueue to consume the steps of a given job and
 	// a write-only chan<- workerResultsChan to publish the step command results
 	for workerId := 1; workerId <= job.NumWorkers; workerId++ {
-		go executeJobStepByWorker(workerResultsChan, taskQueue)
+		go executeJobStepByWorker(workerJobStepResultsChan, taskQueue)
 	}
 
 	// spinner for progress
@@ -37,17 +40,16 @@ func ExecuteJobAsync(job dtos.Job, debug bool) {
 
 	// publish tasks (the job steps commands) to workers
 	for _, jobStep := range job.Steps {
-		taskId++
+		stepId++
 
 		// spinner: adds new step as being 'in progress'
-		stepsInProgress = append(stepsInProgress, fmt.Sprintf("step %d", taskId))
+		stepsInProgress = append(stepsInProgress, fmt.Sprintf("step %d", stepId))
 		updatedStepsInProgress := fmt.Sprintf(stepsInProgressText, strings.Join(stepsInProgress, ", "))
 
 		updateSpinnerPrefix(s, updatedStepsInProgress, true)
 
 		// sends step to worker
-		workerData := newWorkerData(taskId, jobStep, debug)
-		taskQueue <- workerData
+		taskQueue <- newWorkerData(stepId, jobStep, jobExecutionRules)
 	}
 
 	// no more tasks (breaks loops from workers)
@@ -55,18 +57,32 @@ func ExecuteJobAsync(job dtos.Job, debug bool) {
 
 	// collect results
 	for i := 0; i < numTasks; i++ {
-		rslt := <-workerResultsChan
+		stepResult := <-workerJobStepResultsChan
 
-		if rslt.Result.Err != nil {
-			updateSpinnerWithCompleteStep(stepsInProgress, stepsInProgressText, rslt.WorkerId, "💀", s) // mark step as complete
-			ui.PrintCmdFailure(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, continueOnError)
+		if stepResult.CmdResult.Err != nil {
+			updateSpinnerWithCompleteStep(stepsInProgress, stepsInProgressText, stepResult.Id, "💀", s)
+			ui.PrintCmdFailure(
+				stepResult.JobStep.Name,
+				stepResult.CmdResult.StdoutData,
+				stepResult.CmdResult.StderrData,
+				continueOnError,
+			)
 		} else {
-			updateSpinnerWithCompleteStep(stepsInProgress, stepsInProgressText, rslt.WorkerId, "👍", s) // mark step as complete
-			ui.PrintCmdFeedback(rslt.Name, rslt.Result.StdoutData, rslt.Result.StderrData, debug)
+			updateSpinnerWithCompleteStep(stepsInProgress, stepsInProgressText, stepResult.Id, "👍", s)
+			ui.PrintCmdFeedback(
+				stepResult.JobStep.Name,
+				stepResult.CmdResult.StdoutData,
+				stepResult.CmdResult.StderrData,
+				debug,
+			)
 		}
+
+		jobResult.StepsResults[stepResult.Id-1] = stepResult
 	}
 
 	log.Info().Msgf("📝 job steps results: [%s]", strings.Join(stepsInProgress, ", "))
+
+	return jobResult
 }
 
 // updateSpinner updates the spinner steps in progress with either a success or failure mark
