@@ -1,0 +1,26 @@
+jobs:
+  - title: running sync sleeps 1
+    continue_on_error: true
+    steps:
+      - name: sleep 1
+        run: sleep 1 && echo "slept for 1s"
+      - name: sleep 2
+        run: zsleep 2 && echo "slept for 2s" # <-- error, but continues to next job: continue_on_error = true
+      - name: sleep 3
+        run: sleep 3 && echo "slept for 3s"
+
+  - title: running async sleeps
+    continue_on_error: false
+    num_workers: 2
+    steps:
+      - name: sleep 1
+        run: sleep 1 && echo "slept for 1s"
+      - name: sleep 1
+        run: xsleep 1 && echo "slept for 1s" # <-- error, does not continue to next job: continue_on_error = false
+
+  - title: running sync sleep 2
+    steps:
+      - name: sleep 1
+        run: sleep 1 && echo "slept for 1s"
+      - name: sleep 1
+        run: sleep 1 && echo "slept for 1s"
