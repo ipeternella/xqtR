@@ -12,17 +12,14 @@ import (
 )
 
 func ExecuteJobSync(job dtos.Job, debug bool) dtos.JobResult {
-	jobResult := dtos.NewEmptyJobResult(job)
-	jobExecutionRules := dtos.NewJobExecutionRules(debug, job.ContinueOnError)
-	stepId := 0
-
 	log.Info().Msgf("📝 job: %s", job.Title)
 
-	for _, jobStep := range job.Steps {
-		stepId++
+	jobResult := dtos.NewEmptyJobResult(job)
+	jobExecutionRules := dtos.NewJobExecutionRules(debug, job.ContinueOnError)
 
+	for stepId, jobStep := range job.Steps {
 		jobStepResult := executeJobStep(stepId, jobStep, jobExecutionRules) // mutates stepResult
-		jobResult.StepsResults[jobStepResult.Id-1] = jobStepResult          // stepId is 1-index based and not 0-index based
+		jobResult.StepsResults[jobStepResult.Id] = jobStepResult            // stepId is 1-index based and not 0-index based
 
 		// breaks if there's an error and we should not continue upon errors
 		if jobStepResult.HasError && !jobExecutionRules.ContinueOnError {

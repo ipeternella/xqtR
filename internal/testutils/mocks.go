@@ -3,7 +3,11 @@
 // helper functions (such as mocks, etc.) to be used by *_test.go files.
 package testutils
 
-import "github.com/IgooorGP/xqtR/internal/dtos"
+import (
+	"fmt"
+
+	"github.com/IgooorGP/xqtR/internal/dtos"
+)
 
 func NewMockJobStep(name string, run string) dtos.JobStep {
 	return dtos.JobStep{
@@ -44,6 +48,23 @@ func NewJobsFileWithTwoSyncTasks() dtos.JobsFile {
 	// no continuing upon errors
 	jobs[0].ContinueOnError = false
 	jobs[1].ContinueOnError = false
+
+	return NewMockJobsFile(jobs)
+}
+
+func NewSingleJobFileBuilder(jobTitle string, stepNamePrefix string, stepCmd string, numSteps int, numWorkers int, continueOnError bool) dtos.JobsFile {
+	jobSteps := []dtos.JobStep{}
+
+	// build steps with same cmd, whose display name gets the counter i "suffix"
+	for i := 0; i < numSteps; i++ {
+		jobSteps = append(jobSteps, NewMockJobStep(fmt.Sprintf("%s - %d", stepNamePrefix, i), stepCmd))
+	}
+
+	jobs := []dtos.Job{
+		NewMockJob(jobTitle, jobSteps, numWorkers),
+	}
+
+	jobs[0].ContinueOnError = continueOnError
 
 	return NewMockJobsFile(jobs)
 }
