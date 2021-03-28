@@ -52,6 +52,40 @@ func NewJobsFileWithTwoSyncTasks() dtos.JobsFile {
 	return NewMockJobsFile(jobs)
 }
 
+func NewSyncJobFileWithEchoStepError(jobTitle string, continueOnError bool) dtos.JobsFile {
+	job := []dtos.JobStep{
+		NewMockJobStep(`echo "hi"`, `echo "hi"`),                         // ok cmd!
+		NewMockJobStep(`echo "hoi with error"`, `wcho "hoi with error"`), // typo on 'echo' -> 'wcho'
+		NewMockJobStep(`echo "hey"`, `echo "hey"`),                       // ok cmd!
+	}
+
+	jobs := []dtos.Job{
+		NewMockJob(jobTitle, job, 0), // sync job
+	}
+
+	// no continuing upon errors
+	jobs[0].ContinueOnError = continueOnError
+
+	return NewMockJobsFile(jobs)
+}
+
+func NewAsyncJobFileWithEchoStepError(jobTitle string, numWorkers int, continueOnError bool) dtos.JobsFile {
+	job := []dtos.JobStep{
+		NewMockJobStep(`echo "hi"`, `echo "hi"`),
+		NewMockJobStep(`echo "hoi with error"`, `wcho "hoi with error"`), // typo on 'echo' -> 'wcho'
+		NewMockJobStep(`echo "hey"`, `echo "hey"`),
+	}
+
+	jobs := []dtos.Job{
+		NewMockJob(jobTitle, job, numWorkers), // sync job
+	}
+
+	// no continuing upon errors
+	jobs[0].ContinueOnError = continueOnError
+
+	return NewMockJobsFile(jobs)
+}
+
 func NewSingleJobFileBuilder(jobTitle string, stepNamePrefix string, stepCmd string, numSteps int, numWorkers int, continueOnError bool) dtos.JobsFile {
 	jobSteps := []dtos.JobStep{}
 
