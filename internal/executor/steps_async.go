@@ -15,8 +15,9 @@ import (
 func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 	log.Info().Msgf("📝 job: %s", job.Title)
 
-	jobResult := dtos.NewEmptyJobResult(job)
 	jobExecutionRules := dtos.NewJobExecutionRules(debug, job.ContinueOnError)
+	jobResult := dtos.NewEmptyJobResult(job)
+	jobHasStepsWithErrors := false
 
 	continueOnError := job.ContinueOnError
 	numTasks := len(job.Steps)
@@ -57,6 +58,11 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 	for i := 0; i < numTasks; i++ {
 		stepResult := <-workerJobStepResultsChan
 
+		// mark job result as error'd
+		if stepResult.HasError {
+			jobHasStepsWithErrors = true
+		}
+
 		if stepResult.CmdResult.Err != nil {
 			updateSpinnerWithCompleteStep(stepsInProgress, stepsInProgressText, stepResult.Id, "💀", s)
 			ui.PrintCmdFailure(
@@ -79,6 +85,7 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 	}
 
 	log.Info().Msgf("📝 job steps results: [%s]", strings.Join(stepsInProgress, ", "))
+	jobResult.HasError = jobHasStepsWithErrors
 	jobResult.Executed = true
 
 	return jobResult

@@ -13,16 +13,6 @@ type JobDispatcher struct {
 	ExecuteJobAsync JobExecutor
 }
 
-func jobResultContainsErrors(jobResult dtos.JobResult) bool {
-	for _, stepResult := range jobResult.StepsResults {
-		if stepResult.HasError {
-			return true
-		}
-	}
-
-	return false
-}
-
 // DispatchForExecution uses the defined `num_workers` from the yaml file to run a job
 // synchronously or asynchronously with more goroutines.
 func (dispatcher JobDispatcher) DispatchForExecution(job dtos.Job, debug bool) dtos.JobResult {
@@ -47,7 +37,7 @@ func (dispatcher JobDispatcher) DispatchJobsForExecution(jobs []dtos.Job, debug 
 		yamlResults.JobResults[i] = jobResult // rewrite with results
 
 		// job has steps with errors and `continue_on_error` is set to false: break
-		if jobResultContainsErrors(jobResult) && !job.ContinueOnError {
+		if jobResult.HasError && !job.ContinueOnError {
 			break
 		}
 	}

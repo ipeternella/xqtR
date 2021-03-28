@@ -18,6 +18,7 @@ type JobResult struct {
 	Title        string
 	StepsResults []JobStepResult
 	Executed     bool
+	HasError     bool
 }
 
 type JobsYamlResult struct {
