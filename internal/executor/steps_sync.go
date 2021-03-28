@@ -42,7 +42,6 @@ func ExecuteJobSync(job dtos.Job, debug bool) dtos.JobResult {
 func executeJobStep(jobStepId int, jobStep dtos.JobStep, executionRules dtos.JobExecutionRules) dtos.JobStepResult {
 	var cmdResult dtos.CmdResult
 	var debug = executionRules.Debug
-	var continueOnError = executionRules.ContinueOnError
 	var stepResult = dtos.NewEmptyJobStepResult(jobStepId, jobStep)
 
 	cmd, cmdStdoutPipe, cmdStderrPipe := shellCommand(jobStep.Run)
@@ -66,7 +65,7 @@ func executeJobStep(jobStepId int, jobStep dtos.JobStep, executionRules dtos.Job
 		cmdResult = dtos.NewCmdResult(stdoutData, stderrData, err)
 		markStepAsExecuted(&stepResult, cmdResult)
 
-		ui.PrintCmdFailure(jobStep.Name, stdoutData, stderrData, continueOnError)
+		ui.PrintCmdFailure(jobStep.Name, stdoutData, stderrData)
 	} else {
 		cmdResult = dtos.NewCmdResult(stdoutData, stderrData, nil)
 		markStepAsExecuted(&stepResult, cmdResult)
