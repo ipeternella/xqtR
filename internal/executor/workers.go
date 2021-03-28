@@ -22,7 +22,7 @@ func newCmdResult(stdoutData []byte, stderrData []byte, err error) *dtos.CmdResu
 }
 
 // split jobSteps
-func executeJobStepByWorker(workerResults chan<- *dtos.JobStepResult, taskQueue <-chan *dtos.WorkerData) {
+func executeJobStepByWorker(workerResults chan<- dtos.JobStepResult, taskQueue <-chan *dtos.WorkerData) {
 	// keep consuming from queue as long its opened (chan blocks if there are no tasks)
 	for workerData := range taskQueue {
 		var jobStepResult = dtos.NewEmptyJobStepResult(workerData.StepId, workerData.JobStep)
@@ -46,7 +46,7 @@ func executeJobStepByWorker(workerResults chan<- *dtos.JobStepResult, taskQueue 
 		// publish back to main goroutine the cmd result
 		// workerResult := newWorkerResult(workerData.StepId, workerData.JobStep.Name, cmdResult)
 		// jobStepResult.CmdResult = cmdResult
-		markStepAsExecuted(jobStepResult, *cmdResult)
+		markStepAsExecuted(&jobStepResult, *cmdResult)
 
 		workerResults <- jobStepResult
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type JobExecutor func(job dtos.Job, debug bool) *dtos.JobResult
+type JobExecutor func(job dtos.Job, debug bool) dtos.JobResult
 
 type JobDispatcher struct {
 	ExecuteJobSync  JobExecutor
@@ -16,8 +16,8 @@ type JobDispatcher struct {
 
 // DispatchForExecution uses the defined `num_workers` from the yaml file to run a job
 // synchronously or asynchronously with more goroutines.
-func (dispatcher JobDispatcher) DispatchForExecution(job dtos.Job, debug bool) *dtos.JobResult {
-	var jobResult *dtos.JobResult
+func (dispatcher JobDispatcher) DispatchForExecution(job dtos.Job, debug bool) dtos.JobResult {
+	var jobResult dtos.JobResult
 
 	if job.NumWorkers > 1 {
 		jobResult = dispatcher.ExecuteJobAsync(job, debug)
@@ -31,7 +31,7 @@ func (dispatcher JobDispatcher) DispatchForExecution(job dtos.Job, debug bool) *
 // DispatchJobsForExecution is a wrapper which calls DispatchForExecution for each distinct
 // job given by the job yaml file.
 func (dispatcher JobDispatcher) DispatchJobsForExecution(jobs []dtos.Job, debug bool) *dtos.JobsYamlResult {
-	jobResults := []*dtos.JobResult{}
+	jobResults := []dtos.JobResult{}
 
 	for _, job := range jobs {
 		jobResult := dispatcher.DispatchForExecution(job, debug)

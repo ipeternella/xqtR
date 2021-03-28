@@ -24,7 +24,7 @@ func TestDispatchForSyncJobOnly(t *testing.T) {
 	syncCalled := false
 	asyncCalled := false
 
-	syncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+	syncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
 		syncCalled = true
 
@@ -33,7 +33,7 @@ func TestDispatchForSyncJobOnly(t *testing.T) {
 		return dtos.NewEmptyJobResult(mockResult)
 	}
 
-	asyncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
 		syncCalled = true
 
@@ -59,7 +59,7 @@ func TestDispatchForAsyncJobOnly(t *testing.T) {
 	syncCalled := false
 	asyncCalled := false
 
-	syncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+	syncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
 		syncCalled = true
 
@@ -68,7 +68,7 @@ func TestDispatchForAsyncJobOnly(t *testing.T) {
 		return dtos.NewEmptyJobResult(mockResult)
 	}
 
-	asyncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
 		syncCalled = true
 
@@ -94,7 +94,7 @@ func TestDispatchForSyncAndAsyncJobs(t *testing.T) {
 	syncCalled := false
 	asyncCalled := false
 
-	syncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+	syncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
 		syncCalled = true
 
@@ -103,7 +103,7 @@ func TestDispatchForSyncAndAsyncJobs(t *testing.T) {
 		return dtos.NewEmptyJobResult(mockResult)
 	}
 
-	asyncJobExecutorMock := func(job dtos.Job, debug bool) *dtos.JobResult {
+	asyncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
 		syncCalled = true
 

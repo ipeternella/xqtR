@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ExecuteJobAsync(job dtos.Job, debug bool) *dtos.JobResult {
+func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 	log.Info().Msgf("📝 job: %s", job.Title)
 
 	jobResult := dtos.NewEmptyJobResult(job)
@@ -21,8 +21,8 @@ func ExecuteJobAsync(job dtos.Job, debug bool) *dtos.JobResult {
 	continueOnError := job.ContinueOnError
 	numTasks := len(job.Steps)
 
-	workerJobStepResultsChan := make(chan *dtos.JobStepResult, numTasks) // buffered channel
-	taskQueue := make(chan *dtos.WorkerData)                             // unbuffered channel
+	workerJobStepResultsChan := make(chan dtos.JobStepResult, numTasks) // buffered channel
+	taskQueue := make(chan *dtos.WorkerData)                            // unbuffered channel
 	stepId := 0
 
 	// spawn NumWorkers goroutines that are initially blocked (no tasks).

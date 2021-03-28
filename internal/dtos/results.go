@@ -10,14 +10,14 @@ type JobStepResult struct {
 
 type JobResult struct {
 	Title        string
-	StepsResults []*JobStepResult
+	StepsResults []JobStepResult
 }
 
 type JobsYamlResult struct {
-	JobResults []*JobResult
+	JobResults []JobResult
 }
 
-func NewJobsYamlResult(jobResults []*JobResult) *JobsYamlResult {
+func NewJobsYamlResult(jobResults []JobResult) *JobsYamlResult {
 	return &JobsYamlResult{JobResults: jobResults}
 }
 
@@ -40,8 +40,8 @@ func NewJobStepResult(id int, jobStep JobStep, cmdResult *CmdResult, executed bo
 }
 
 // Empty structs
-func NewEmptyJobStepResult(id int, jobStep JobStep) *JobStepResult {
-	return &JobStepResult{
+func NewEmptyJobStepResult(id int, jobStep JobStep) JobStepResult {
+	return JobStepResult{
 		Id:        id,
 		JobStep:   jobStep,
 		CmdResult: nil,
@@ -50,15 +50,15 @@ func NewEmptyJobStepResult(id int, jobStep JobStep) *JobStepResult {
 	}
 }
 
-func NewEmptyJobResult(job Job) *JobResult {
-	stepResults := []*JobStepResult{}
+func NewEmptyJobResult(job Job) JobResult {
+	stepResults := []JobStepResult{}
 
 	// initialize step results with just the step id and its jobStep data (but no cmd results, not executed, etc.)
 	for id, jobStep := range job.Steps {
 		stepResults = append(stepResults, NewEmptyJobStepResult(id, jobStep))
 	}
 
-	return &JobResult{
+	return JobResult{
 		Title:        job.Title,
 		StepsResults: stepResults,
 	}

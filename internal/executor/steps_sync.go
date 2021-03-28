@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ExecuteJobSync(job dtos.Job, debug bool) *dtos.JobResult {
+func ExecuteJobSync(job dtos.Job, debug bool) dtos.JobResult {
 	jobResult := dtos.NewEmptyJobResult(job)
 	jobExecutionRules := dtos.NewJobExecutionRules(debug, job.ContinueOnError)
 	stepId := 0
@@ -33,7 +33,7 @@ func ExecuteJobSync(job dtos.Job, debug bool) *dtos.JobResult {
 	return jobResult
 }
 
-func executeJobStep(jobStepId int, jobStep dtos.JobStep, executionRules dtos.JobExecutionRules) *dtos.JobStepResult {
+func executeJobStep(jobStepId int, jobStep dtos.JobStep, executionRules dtos.JobExecutionRules) dtos.JobStepResult {
 	var cmdResult dtos.CmdResult
 	var debug = executionRules.Debug
 	var continueOnError = executionRules.ContinueOnError
@@ -58,12 +58,12 @@ func executeJobStep(jobStepId int, jobStep dtos.JobStep, executionRules dtos.Job
 	// waits for cmd completion to close stdstreams
 	if err := cmd.Wait(); err != nil {
 		cmdResult = dtos.NewCmdResult(stdoutData, stderrData, err)
-		markStepAsExecuted(stepResult, cmdResult)
+		markStepAsExecuted(&stepResult, cmdResult)
 
 		ui.PrintCmdFailure(jobStep.Name, stdoutData, stderrData, continueOnError)
 	} else {
 		cmdResult = dtos.NewCmdResult(stdoutData, stderrData, nil)
-		markStepAsExecuted(stepResult, cmdResult)
+		markStepAsExecuted(&stepResult, cmdResult)
 
 		ui.PrintCmdFeedback(jobStep.Name, stdoutData, stderrData, debug)
 	}
