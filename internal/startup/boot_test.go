@@ -11,6 +11,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestShouldBootWithoutErrors(t *testing.T) {
+	// arrange
+	cfg := config.NewXqtRConfigWithDefaults()
+
+	// act
+	booted := Boot(&cfg)
+
+	// assert
+	assert.True(t, booted) // successfully booted
+}
+
 func TestShouldPrintToStdoutWhenLogLevelIsInfo(t *testing.T) {
 	// arrange
 	cfg := config.NewXqtRConfigWithDefaults()
