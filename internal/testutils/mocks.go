@@ -69,6 +69,29 @@ func NewSyncJobFileWithEchoStepError(jobTitle string, continueOnError bool) dtos
 	return NewMockJobsFile(jobs)
 }
 
+func NewJobFileTwoJobs_FirstJobWithError(jobTitle string, numWorkers int, continueOnError bool) dtos.JobsFile {
+	job1 := []dtos.JobStep{
+		NewMockJobStep(`echo "hi"`, `echo "hi"`),                         // ok cmd!
+		NewMockJobStep(`echo "hoi with error"`, `wcho "hoi with error"`), // typo on 'echo' -> 'wcho'
+		NewMockJobStep(`echo "hey"`, `echo "hey"`),                       // ok cmd!
+	}
+
+	job2 := []dtos.JobStep{
+		NewMockJobStep(`echo "hi"`, `echo "hi"`), // ok cmd!
+	}
+
+	jobs := []dtos.Job{
+		NewMockJob(jobTitle, job1, numWorkers), // job contains cmd with error
+		NewMockJob(jobTitle, job2, numWorkers), // job contains no errors!
+	}
+
+	// no continuing upon errors
+	jobs[0].ContinueOnError = continueOnError
+	jobs[0].ContinueOnError = continueOnError
+
+	return NewMockJobsFile(jobs)
+}
+
 func NewAsyncJobFileWithEchoStepError(jobTitle string, numWorkers int, continueOnError bool) dtos.JobsFile {
 	job := []dtos.JobStep{
 		NewMockJobStep(`echo "hi"`, `echo "hi"`),
