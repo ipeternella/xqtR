@@ -41,7 +41,7 @@ func (dispatcher JobDispatcher) DispatchJobsForExecution(jobs []dtos.Job, debug 
 	for _, jobResult := range jobResults {
 
 		for _, stepResult := range jobResult.StepsResults {
-			log.Info().Msgf("%s, executed: %s, error: %s", stepResult.JobStep.Name, stepResult.Executed, stepResult.HasError)
+			log.Info().Msgf("%s, executed: %t, error: %t", stepResult.JobStep.Name, stepResult.Executed, stepResult.HasError)
 		}
 	}
 
