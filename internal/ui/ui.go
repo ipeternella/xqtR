@@ -17,9 +17,10 @@ func PrintCmdFailure(stepName string, stdoutData []byte, stderrData []byte, cont
 	log.Error().Msgf("⌛ step: %s 💀", stepName)
 	log.Error().Msgf("%s%s%s", processStderrHeader, stderrData, processStderrFooter)
 
-	if !continueOnError {
-		log.Fatal().Msg("Step has failed and 'continue_on_error' is false. Exiting...")
-	}
+	// does not exit here anymore...
+	// if !continueOnError {
+	// 	log.Fatal().Msg("Step has failed and 'continue_on_error' is false. Exiting...")
+	// }
 }
 
 func PrintCmdFeedback(stepName string, stdoutData []byte, stderrData []byte, debug bool) {

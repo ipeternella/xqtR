@@ -27,6 +27,7 @@ The name of this project was inspired on the retired Norwegian professional coun
 
 - [Introduction](#Introduction)
   - [How does it work](#How-does-it-work)
+  - [How to install](#How-to-install)
 - [How to Use](#How-to-use)
   - [Job Yaml Schema](#Job-yaml-schema)
   - [Stdout and Stderr](#Stdout-and-stderr)
@@ -57,6 +58,14 @@ Here's the full job yaml concepts:
 - Run instructions are commands that will be executed on your system shell (bash only for now)
 
 The spawned processes are plugged to os pipes that captures their `stdstreams` (`stdout` and `stderr`) which can be used to display errors, warnings, or the command's `stdout` when the tool's `--log-level` is set to `debug`.
+
+## How to install
+
+This will be improved in the future, but, as of now, each code that is pushed to the `main` branch triggers a pipeline that runs tests, SonarCloud (Sonarqube) analysis and publishes releases to Github that contains `xqtR` latest binaries.
+
+Hence, to install, just download the `xqtR` binary from the latest Github Release of this repo for your desired OS (currently only `macOS` and `Linux (ubuntu)` -- might work on other Linux distros too are supported -- and put the program binary into your `$PATH` variable to use the executable anywhere in your shell. It will probably be necessary to change de permission bits of the binary with `chmod` to make it executable by your OS user.
+
+So, for now, no `Windows` support (not yet!!)
 
 ## How to use
 
@@ -154,4 +163,8 @@ jobs:
 
 As unfortunate as is, the steps' commands, once executed, can return non-zero return status codes due to some unexpected error such as file that's not found, a command typo, etc.! For dealing with errors, each `job` allows the key `continue_on_errors` which is a boolean that if set to `true` will capture the step process's stderr and print it whereas the other other steps (and also other jobs) will execute normally.
 
-If `continue_on_errors` is set to `false`, then the step process's stderr is printed and `xqtR` quits with status 1 (other steps and jobs will NOT execute).
+If `continue_on_errors` is set to `false` (default), then the behavior depends whether the current job is `sync` or `async`:
+
+- If the job is `sync`: the steps after the current step (in the same job) that raised the error will NOT be executed. Here, differently than `async jobs`, one step that raises an error **WILL NOT ALLOW** subsequent steps in the same job to execute. Also, the next jobs and their steps will NOT be executed as well: `continue_on_errors: false` stops the current job and will not allow next jobs to run.
+
+- If the job is `async` (i.e `num_workers` > 1): if a step of an async job raises an error, it will **NOT STOP** the other concurrent steps are being executed on the workpool in other goroutines (this is currently impossible: the workpool will execute all the steps and only after the results are collected). However, the next jobs **will NOT** execute. Hence `continue_on_errors: true` for an async job does not guarantee that a step that raises an error will stop the other concurrent steps of the same job: it will NOT, concurrent steps execute to completion (either a success or error), but it will prevent subsequent jobs to be executed.

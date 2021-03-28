@@ -5,11 +5,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func newWorkerData(id int, jobStep dtos.JobStep, debug bool) *dtos.WorkerData {
+func newWorkerData(stepId int, jobStep dtos.JobStep, jobExecutionRules dtos.JobExecutionRules) *dtos.WorkerData {
 	return &dtos.WorkerData{
-		Id:      id,
-		JobStep: jobStep,
-		Debug:   debug,
+		StepId:            stepId,
+		JobStep:           jobStep,
+		JobExecutionRules: jobExecutionRules,
 	}
 }
 
@@ -21,21 +21,13 @@ func newCmdResult(stdoutData []byte, stderrData []byte, err error) *dtos.CmdResu
 	}
 }
 
-func newWorkerResult(workerId int, name string, cmdResult *dtos.CmdResult) *dtos.WorkerResult {
-	return &dtos.WorkerResult{
-		WorkerId: workerId,
-		Name:     name,
-		Result:   cmdResult,
-	}
-}
-
 // split jobSteps
-func executeJobStepByWorker(workerResults chan<- *dtos.WorkerResult, taskQueue <-chan *dtos.WorkerData) {
+func executeJobStepByWorker(workerResults chan<- dtos.JobStepResult, taskQueue <-chan *dtos.WorkerData) {
 	// keep consuming from queue as long its opened (chan blocks if there are no tasks)
 	for workerData := range taskQueue {
-		// log.Info().Msgf("⏳ step: %s", workerData.JobStep.Name)
+		var jobStepResult = dtos.NewEmptyJobStepResult(workerData.StepId, workerData.JobStep)
+		var cmdResult *dtos.CmdResult
 
-		var rslt *dtos.CmdResult
 		cmd, cmdStdoutPipe, cmdStderrPipe := shellCommand(workerData.JobStep.Run)
 
 		// spawns a new OS process with the cmd
@@ -43,16 +35,19 @@ func executeJobStepByWorker(workerResults chan<- *dtos.WorkerResult, taskQueue <
 			log.Fatal().Msgf("An error happened while starting the cmd: %s", err.Error())
 		}
 
-		stdoutData, stderrData := readCmdStdStreams(cmdStdoutPipe, cmdStderrPipe, workerData.Debug)
+		stdoutData, stderrData := readCmdStdStreams(cmdStdoutPipe, cmdStderrPipe, workerData.JobExecutionRules.Debug)
 
 		if err := cmd.Wait(); err != nil {
-			rslt = newCmdResult(stdoutData, stderrData, err) // something bad happened
+			cmdResult = newCmdResult(stdoutData, stderrData, err) // something bad happened
 		} else {
-			rslt = newCmdResult(stdoutData, stderrData, nil) // all good (hopefully!)
+			cmdResult = newCmdResult(stdoutData, stderrData, nil) // all good (hopefully!)
 		}
 
 		// publish back to main goroutine the cmd result
-		workerResult := newWorkerResult(workerData.Id, workerData.JobStep.Name, rslt)
-		workerResults <- workerResult
+		// workerResult := newWorkerResult(workerData.StepId, workerData.JobStep.Name, cmdResult)
+		// jobStepResult.CmdResult = cmdResult
+		markStepAsExecuted(&jobStepResult, *cmdResult)
+
+		workerResults <- jobStepResult
 	}
 }
