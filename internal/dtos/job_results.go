@@ -1,5 +1,11 @@
 package dtos
 
+type CmdResult struct {
+	StdoutData []byte
+	StderrData []byte
+	Err        error
+}
+
 type JobStepResult struct {
 	Id        int     // JobId
 	JobStep   JobStep // the job step data
@@ -11,6 +17,7 @@ type JobStepResult struct {
 type JobResult struct {
 	Title        string
 	StepsResults []JobStepResult
+	Executed     bool
 }
 
 type JobsYamlResult struct {
@@ -62,4 +69,14 @@ func NewEmptyJobResult(job Job) JobResult {
 		Title:        job.Title,
 		StepsResults: stepResults,
 	}
+}
+
+func NewEmptyJobsYamlResult(jobs []Job) JobsYamlResult {
+	jobResults := []JobResult{}
+
+	for _, job := range jobs {
+		jobResults = append(jobResults, NewEmptyJobResult(job))
+	}
+
+	return JobsYamlResult{JobResults: jobResults}
 }

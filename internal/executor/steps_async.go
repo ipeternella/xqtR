@@ -79,6 +79,7 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 	}
 
 	log.Info().Msgf("📝 job steps results: [%s]", strings.Join(stepsInProgress, ", "))
+	jobResult.Executed = true
 
 	return jobResult
 }

@@ -1,22 +1,10 @@
 package dtos
 
-type CmdResult struct {
-	StdoutData []byte
-	StderrData []byte
-	Err        error
-}
-
 type WorkerData struct {
 	StepId            int
 	JobStep           JobStep
 	JobExecutionRules JobExecutionRules
 }
-
-// type WorkerResult struct {
-// 	StepId int
-// 	Name   string // jobStep name
-// 	Result *CmdResult
-// }
 
 type JobExecutionRules struct {
 	Debug           bool

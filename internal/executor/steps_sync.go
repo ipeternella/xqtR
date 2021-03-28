@@ -18,15 +18,16 @@ func ExecuteJobSync(job dtos.Job, debug bool) dtos.JobResult {
 	jobExecutionRules := dtos.NewJobExecutionRules(debug, job.ContinueOnError)
 
 	for stepId, jobStep := range job.Steps {
-		jobStepResult := executeJobStep(stepId, jobStep, jobExecutionRules) // mutates stepResult
-		jobResult.StepsResults[jobStepResult.Id] = jobStepResult            // stepId is 1-index based and not 0-index based
+		jobStepResult := executeJobStep(stepId, jobStep, jobExecutionRules)
+		jobResult.StepsResults[jobStepResult.Id] = jobStepResult
 
 		// breaks if there's an error and we should not continue upon errors
 		if jobStepResult.HasError && !jobExecutionRules.ContinueOnError {
-			return jobResult
+			break
 		}
 	}
 
+	jobResult.Executed = true
 	return jobResult
 }
 

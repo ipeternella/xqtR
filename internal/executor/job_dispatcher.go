@@ -4,7 +4,6 @@ package executor
 
 import (
 	"github.com/IgooorGP/xqtR/internal/dtos"
-	"github.com/rs/zerolog/log"
 )
 
 type JobExecutor func(job dtos.Job, debug bool) dtos.JobResult
@@ -12,6 +11,16 @@ type JobExecutor func(job dtos.Job, debug bool) dtos.JobResult
 type JobDispatcher struct {
 	ExecuteJobSync  JobExecutor
 	ExecuteJobAsync JobExecutor
+}
+
+func jobResultContainsErrors(jobResult dtos.JobResult) bool {
+	for _, stepResult := range jobResult.StepsResults {
+		if stepResult.HasError {
+			return true
+		}
+	}
+
+	return false
 }
 
 // DispatchForExecution uses the defined `num_workers` from the yaml file to run a job
@@ -30,22 +39,20 @@ func (dispatcher JobDispatcher) DispatchForExecution(job dtos.Job, debug bool) d
 
 // DispatchJobsForExecution is a wrapper which calls DispatchForExecution for each distinct
 // job given by the job yaml file.
-func (dispatcher JobDispatcher) DispatchJobsForExecution(jobs []dtos.Job, debug bool) *dtos.JobsYamlResult {
-	jobResults := []dtos.JobResult{}
+func (dispatcher JobDispatcher) DispatchJobsForExecution(jobs []dtos.Job, debug bool) dtos.JobsYamlResult {
+	yamlResults := dtos.NewEmptyJobsYamlResult(jobs)
 
-	for _, job := range jobs {
+	for i, job := range jobs {
 		jobResult := dispatcher.DispatchForExecution(job, debug)
-		jobResults = append(jobResults, jobResult)
-	}
+		yamlResults.JobResults[i] = jobResult // rewrite with results
 
-	for _, jobResult := range jobResults {
-
-		for _, stepResult := range jobResult.StepsResults {
-			log.Info().Msgf("%s, executed: %t, error: %t", stepResult.JobStep.Name, stepResult.Executed, stepResult.HasError)
+		// job has steps with errors and `continue_on_error` is set to false: break
+		if jobResultContainsErrors(jobResult) && !job.ContinueOnError {
+			break
 		}
 	}
 
-	return dtos.NewJobsYamlResult(jobResults)
+	return yamlResults
 }
 
 // NewJobDispatcher creates a new job dispatcher with executors to run jobs synchronously
