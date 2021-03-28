@@ -23,7 +23,6 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 
 	workerJobStepResultsChan := make(chan dtos.JobStepResult, numTasks) // buffered channel
 	taskQueue := make(chan *dtos.WorkerData)                            // unbuffered channel
-	stepId := 0
 
 	// spawn NumWorkers goroutines that are initially blocked (no tasks).
 	// workers receive a read-only <-chan taskQueue to consume the steps of a given job and
@@ -39,8 +38,7 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 	s.Start()
 
 	// publish tasks (the job steps commands) to workers
-	for _, jobStep := range job.Steps {
-		stepId++
+	for stepId, jobStep := range job.Steps {
 
 		// spinner: adds new step as being 'in progress'
 		stepsInProgress = append(stepsInProgress, fmt.Sprintf("step %d", stepId))
@@ -77,7 +75,7 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 			)
 		}
 
-		jobResult.StepsResults[stepResult.Id-1] = stepResult
+		jobResult.StepsResults[stepResult.Id] = stepResult
 	}
 
 	log.Info().Msgf("📝 job steps results: [%s]", strings.Join(stepsInProgress, ", "))
@@ -86,9 +84,8 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 }
 
 // updateSpinner updates the spinner steps in progress with either a success or failure mark
-func updateSpinnerWithCompleteStep(stepsInProgress []string, stepsInProgressText string, workerId int, mark string, spin *spinner.Spinner) {
-	ix := workerId - 1
-	stepsInProgress[ix] = mark
+func updateSpinnerWithCompleteStep(stepsInProgress []string, stepsInProgressText string, stepId int, mark string, spin *spinner.Spinner) {
+	stepsInProgress[stepId] = mark
 	updatedStepsInProgress := fmt.Sprintf(stepsInProgressText, strings.Join(stepsInProgress, ", "))
 
 	// reload spinner
