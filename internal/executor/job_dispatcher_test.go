@@ -35,7 +35,7 @@ func TestDispatchForSyncJobOnly(t *testing.T) {
 
 	asyncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
-		syncCalled = true
+		asyncCalled = true
 
 		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
 
@@ -70,7 +70,7 @@ func TestDispatchForAsyncJobOnly(t *testing.T) {
 
 	asyncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
-		syncCalled = true
+		asyncCalled = true
 
 		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
 
@@ -105,7 +105,7 @@ func TestDispatchForSyncAndAsyncJobs(t *testing.T) {
 
 	asyncJobExecutorMock := func(job dtos.Job, debug bool) dtos.JobResult {
 		var mockJobSteps []dtos.JobStep
-		syncCalled = true
+		asyncCalled = true
 
 		mockResult := dtos.Job{Title: "mock", Steps: mockJobSteps}
 
