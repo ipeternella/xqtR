@@ -37,8 +37,8 @@ func NewJobsFileWithTwoSyncTasks() dtos.JobsFile {
 	}
 
 	jobs := []dtos.Job{
-		NewMockJob("echoing to stdout", job1, 0), // sync job
-		NewMockJob("sleeping 1s", job2, 0),       // sync job
+		NewMockJob("job name 1", job1, 0), // sync job
+		NewMockJob("job name 2", job2, 0), // sync job
 	}
 
 	// no continuing upon errors
