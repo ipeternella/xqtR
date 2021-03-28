@@ -13,14 +13,9 @@ const (
 	processStderrFooter  = "\n>---------------<"
 )
 
-func PrintCmdFailure(stepName string, stdoutData []byte, stderrData []byte, continueOnError bool) {
+func PrintCmdFailure(stepName string, stdoutData []byte, stderrData []byte) {
 	log.Error().Msgf("⌛ step: %s 💀", stepName)
 	log.Error().Msgf("%s%s%s", processStderrHeader, stderrData, processStderrFooter)
-
-	// does not exit here anymore...
-	// if !continueOnError {
-	// 	log.Fatal().Msg("Step has failed and 'continue_on_error' is false. Exiting...")
-	// }
 }
 
 func PrintCmdFeedback(stepName string, stdoutData []byte, stderrData []byte, debug bool) {

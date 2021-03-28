@@ -56,3 +56,23 @@ func TestShouldPrintCmdFeedbackStderrAndStdout(t *testing.T) {
 	assert.Contains(t, processStdstreamData, expectedStderrData)
 	assert.Contains(t, processStdstreamData, expectedStdoutData) // debug is true, so stdout should have be sent
 }
+
+func TestShouldPrintCmdFailure(t *testing.T) {
+	// arrange -> set logger output to local buffer
+	var logBuffer bytes.Buffer
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: &logBuffer, TimeFormat: time.Kitchen})
+
+	// arrange mock stdout and stderr
+	stdoutMock := []byte("Oops! Something went wrong!")
+	stderrMock := []byte{}
+	stepNameMock := "Bad step!"
+
+	// act
+	PrintCmdFailure(stepNameMock, stdoutMock, stderrMock)
+
+	// assert
+	processStdstreamData := logBuffer.String()
+	expectedStdoutData := "" // error: no stdout, just stderr
+
+	assert.Contains(t, processStdstreamData, expectedStdoutData)
+}

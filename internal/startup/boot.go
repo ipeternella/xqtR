@@ -13,12 +13,14 @@ import (
 )
 
 // Boot is a func that boots the tool by running the appropriate configurations.
-func Boot(cfg *config.XqtRConfig) {
+func Boot(cfg *config.XqtRConfig) bool {
 	stdout := os.Stdout        // grab stdout file descriptor from the OS
 	timeFormat := time.Kitchen // timeformat
 
 	setupLogger(cfg, stdout, timeFormat)
 	log.Debug().Msg("Booting xqtR is complete.")
+
+	return true
 }
 
 func setupLogger(cfg *config.XqtRConfig, outputStream io.Writer, timeFormat string) {

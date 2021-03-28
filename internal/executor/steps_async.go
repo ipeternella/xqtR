@@ -18,8 +18,6 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 	jobExecutionRules := dtos.NewJobExecutionRules(debug, job.ContinueOnError)
 	jobResult := dtos.NewEmptyJobResult(job)
 	jobHasStepsWithErrors := false
-
-	continueOnError := job.ContinueOnError
 	numTasks := len(job.Steps)
 
 	workerJobStepResultsChan := make(chan dtos.JobStepResult, numTasks) // buffered channel
@@ -69,7 +67,6 @@ func ExecuteJobAsync(job dtos.Job, debug bool) dtos.JobResult {
 				stepResult.JobStep.Name,
 				stepResult.CmdResult.StdoutData,
 				stepResult.CmdResult.StderrData,
-				continueOnError,
 			)
 		} else {
 			updateSpinnerWithCompleteStep(stepsInProgress, stepsInProgressText, stepResult.Id, "👍", s)
