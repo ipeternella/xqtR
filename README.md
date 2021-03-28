@@ -27,6 +27,7 @@ The name of this project was inspired on the retired Norwegian professional coun
 
 - [Introduction](#Introduction)
   - [How does it work](#How-does-it-work)
+  - [How to install](#How-to-install)
 - [How to Use](#How-to-use)
   - [Job Yaml Schema](#Job-yaml-schema)
   - [Stdout and Stderr](#Stdout-and-stderr)
@@ -57,6 +58,14 @@ Here's the full job yaml concepts:
 - Run instructions are commands that will be executed on your system shell (bash only for now)
 
 The spawned processes are plugged to os pipes that captures their `stdstreams` (`stdout` and `stderr`) which can be used to display errors, warnings, or the command's `stdout` when the tool's `--log-level` is set to `debug`.
+
+## How to install
+
+This will be improved in the future, but, as of now, each code that is pushed to the `main` branch triggers a pipeline that runs tests, SonarCloud (Sonarqube) analysis and publishes releases to Github that contains `xqtR` latest binaries.
+
+Hence, to install, just download the `xqtR` binary from the latest Github Release of this repo for your desired OS (currently only `macOS` and `Linux (ubuntu)` -- might work on other Linux distros too are supported -- and put the program binary into your `$PATH` variable to use the executable anywhere in your shell. It will probably be necessary to change de permission bits of the binary with `chmod` to make it executable by your OS user.
+
+So, for now, no `Windows` support (not yet!!)
 
 ## How to use
 
